@@ -1,9 +1,9 @@
 # Project-Agora_server
 
-create cert.pem and key.pem via mkcert
+1. create cert.pem and key.pem via mkcert
 
-create database "agora"
+2. create database "agora"
 
-edit .env.exmaple file and rename it to .env
+3. edit .env.exmaple file and rename it to .env
 
-Type npm run start to run the server
+4. Type npm run start to run the server
