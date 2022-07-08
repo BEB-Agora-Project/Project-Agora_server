@@ -1,0 +1,339 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Agora 팀 서버 API",
+    "description": "서버에서 제공하는 API 정보",
+    "version": "1.0.0"
+  },
+  "host": "localhost:4000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "account",
+      "description": "계정 관련"
+    },
+    {
+      "name": "board",
+      "description": "게시판 관련"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "https",
+      "scheme": "authorization",
+      "in": "header",
+      "bearerFormat": "JWT"
+    }
+  },
+  "paths": {
+    "/account/signIn": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "description": "로그인을 한다.",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "body",
+            "description": "유저 이메일",
+            "required": true,
+            "schema": {
+            }
+          },
+          {
+            "name": "password",
+            "in": "body",
+            "description": "유저 패스워드",
+            "required": true,
+            "schema": {
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/account/signUp": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "description": "회원가입을 한다.",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "body",
+            "description": "유저 이메일",
+            "required": true,
+            "schema": {
+            }
+          },
+          {
+            "name": "password",
+            "in": "body",
+            "description": "유저 패스워드",
+            "required": true,
+            "schema": {
+            }
+          },
+          {
+            "name": "userName",
+            "in": "body",
+            "description": "유저 이름",
+            "required": true,
+            "schema": {
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/account/signOut": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "description": "로그아웃을 한다.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/board/write": {
+      "post": {
+        "tags": [
+          "board"
+        ],
+        "description": "게시글을 작성한다.",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "body",
+            "description": "게시글 제목",
+            "required": true,
+            "schema": {
+            }
+          },
+          {
+            "name": "content",
+            "in": "body",
+            "description": "게시글 내용",
+            "required": true,
+            "schema": {
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/writeResponse"
+            }
+          }
+        }
+      }
+    },
+    "/board/{id}": {
+      "get": {
+        "tags": [
+          "board"
+        ],
+        "description": "게시글의 상세정보를 가져온다.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/getWritingResponse"
+            }
+          }
+        }
+      }
+    },
+    "/board/": {
+      "get": {
+        "tags": [
+          "board"
+        ],
+        "description": "게시글 목록을 가져온다.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/getAllWritingResponse"
+            }
+          }
+        }
+      }
+    },
+    "/board/comment/{id}": {
+      "post": {
+        "tags": [
+          "board"
+        ],
+        "description": "게시글에 대한 댓글을 작성한다.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "content",
+            "in": "body",
+            "description": "게시글 내용",
+            "required": true,
+            "schema": {
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/commentResponse"
+            }
+          }
+        }
+      }
+    },
+    "/board/edit/{id}": {
+      "post": {
+        "tags": [
+          "board"
+        ],
+        "description": "게시글을 수정한다.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "수정할 게시글 번호",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "title",
+            "in": "body",
+            "description": "게시글 제목",
+            "required": true,
+            "schema": {
+            }
+          },
+          {
+            "name": "content",
+            "in": "body",
+            "description": "게시글 내용",
+            "required": true,
+            "schema": {
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/writeResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "writeResponse": {
+      "properties": {
+        "boardId": {
+          "type": "number"
+        }
+      }
+    },
+    "getWritingResponse": {
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "title": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "hit": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userName": {
+          "type": "string"
+        },
+        "boardComments": {
+          "type": "object"
+        }
+      }
+    },
+    "getAllWritingResponse": {
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "title": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        },
+        "hit": {
+          "type": "number"
+        },
+        "commentsCount": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "commentResponse": {
+      "properties": {
+        "commentId": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}
+

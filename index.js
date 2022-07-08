@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const accountRoutes = require('./routes/account');
 const boardRoutes = require('./routes/board');
+const swaggerUi = require("swagger-ui-express");
+const swaggerFile = require("./swagger/swagger-output.json");
 const https = require("https");
 const fs = require("fs");
 const app = express();
@@ -25,6 +27,7 @@ app.use(
 // 라우터 연결
 app.use('/account', accountRoutes);
 app.use('/board', boardRoutes);
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 // 데이터베이스 연결 및 HTTPS 서버 실행
 models.sequelize.sync().then( () => {
