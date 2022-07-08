@@ -32,18 +32,19 @@ app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 // 데이터베이스 연결 및 HTTPS 서버 실행
 models.sequelize.sync().then( () => {
     console.log(" DB 연결 성공");
-    let server;
     if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
         const privateKey = fs.readFileSync(__dirname + '/key.pem', 'utf8');
         const certificate = fs.readFileSync(__dirname + '/cert.pem', 'utf8');
         const credentials = { key: privateKey, cert: certificate };
-        server = https.createServer(credentials, app);
+        let server = https.createServer(credentials, app);
         server.listen(PORT, async () => {
             console.log(`      🚀 HTTPS Server is starting on ${PORT}`);
         })
     } else {
-        console.log("error!!!")
-        console.log("Please Create cert.pem, key.pem")
+        app.listen(PORT, async () => {
+            console.log("you don't have cert.pem, key.pem!!")
+            console.log(`      🚀 HTTP Server is starting on ${PORT}`);
+        })
     }
 }).catch(err => {
     console.log("연결 실패");
