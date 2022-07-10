@@ -50,16 +50,22 @@ module.exports = {
     await mutex.runExclusive(async () => {
       //runExclusive always release locks
       //Below code prevents nonce hell
-      const _nonce = await caver.rpc.klay.getTransactionCount(SERVER_ADDRESS);
-      //이 논스는 16진수이므로 추후에 수정
+      let _nonce = await caver.rpc.klay.getTransactionCount(
+        SERVER_ADDRESS,
+        "pending"
+      );
+      _nonce = ParseInt(_nonce, 16);
+
       nonce = nonce > _nonce ? nonce : _nonce;
       console.log(nonce);
+
+      const inputNonce = "0x" + nonce.toString(16);
 
       //parameters엔 업데이트 명단 들어감
       const result = await sendTx(
         erc1155ABI,
         ERC1155_ADDRESS,
-        nonce,
+        inputNonce,
         "tokenMint",
         mintList
       );
@@ -68,14 +74,20 @@ module.exports = {
 
     //토큰을 많이써서 토큰을 태워야 하는사람들 처리
     await mutex.runExclusive(async () => {
-      const _nonce = await caver.rpc.klay.getTransactionCount(SERVER_ADDRESS);
+      let _nonce = await caver.rpc.klay.getTransactionCount(
+        SERVER_ADDRESS,
+        "pending"
+      );
+      _nonce = ParseInt(_nonce, 16);
+
       nonce = nonce > _nonce ? nonce : _nonce;
       console.log(nonce);
 
+      const inputNonce = "0x" + nonce.toString(16);
       const result = await sendTx(
         erc1155ABI,
         ERC1155_ADDRESS,
-        nonce,
+        inputNonce,
         "tokenBurn",
         burnList
       );
@@ -87,16 +99,23 @@ module.exports = {
   },
   nftBuy: async (buyer, tokenId, price) => {
     await mutex.runExclusive(async () => {
-      const _nonce = await caver.rpc.klay.getTransactionCount(SERVER_ADDRESS);
+      let _nonce = await caver.rpc.klay.getTransactionCount(
+        SERVER_ADDRESS,
+        "pending"
+      );
+      _nonce = ParseInt(_nonce, 16);
+
       nonce = nonce > _nonce ? nonce : _nonce;
       console.log(nonce);
+
+      const inputNonce = "0x" + nonce.toString(16);
 
       //parameters엔 구매자, 토큰아이디, 가격 들어감
       const parameters = [buyer, tokenId, price];
       const result = await sendTx(
         erc1155ABI,
         ERC1155_ADDRESS,
-        nonce,
+        inputNonce,
         "buyNFT",
         parameters
       );
@@ -108,16 +127,23 @@ module.exports = {
   archiveDebate: async () => {
     await mutex.runExclusive(async (archivePost) => {
       //runExclusive always release lock
-      const _nonce = await caver.rpc.klay.getTransactionCount(SERVER_ADDRESS);
+      let _nonce = await caver.rpc.klay.getTransactionCount(
+        SERVER_ADDRESS,
+        "pending"
+      );
+      _nonce = ParseInt(_nonce, 16);
+
       nonce = nonce > _nonce ? nonce : _nonce;
       console.log(nonce);
+
+      const inputNonce = "0x" + nonce.toString(16);
       //parameters는 DB에서 가장 최신 debate post 가져와서 해쉬화 해주도록 한다!
       const parameters = archivePost;
 
       const result = await sendTx(
         debateABI,
         DEBATE_ADDRESS,
-        nonce,
+        inputNonce,
         "archiving",
         parameters
       );

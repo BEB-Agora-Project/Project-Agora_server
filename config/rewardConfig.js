@@ -3,4 +3,5 @@ module.exports = {
   boardCommenReward: 5,
   upVotePrice: 3,
   downVotePrice: 3,
+  winFactor: 2,
 };

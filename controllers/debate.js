@@ -97,7 +97,12 @@ module.exports = {
       order: [["createdAt", "DESC"]],
     });
     //어떻게 코멘트를 같이 가져오지?
+    const postId = recentPost.id;
+    //foreignKey를 이렇게 쓰는건지 모르겠음
+    const comments = await Comment.findAll({ boardId: postId });
 
-    return res.send(recentPost);
+    const result = { post: recentPost, comments: comments };
+
+    return res.send(result);
   },
 };
