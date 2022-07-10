@@ -283,6 +283,20 @@
           }
         }
       }
+    },
+    "/board/delete/{id}": {
+      "post": {
+        "tags": [
+          "board"
+        ],
+        "description": "게시글을 삭제한다.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "definitions": {

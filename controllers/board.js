@@ -173,6 +173,36 @@ module.exports = {
             throw new Error(err);
         }
     }),
+    deleteToWriting : asyncWrapper(async (req, res) => {
+
+        const boardData = await board.findOne({
+            where: {id: req.params.id},
+        });
+        const boardId = boardData.id
+        const boardUserId = boardData.userId
+        const decoded = await isAuthorized(req)
+        const userInfo = await user.findOne({
+            where: {id: decoded.id},
+        });
+        if (!boardData) {
+            throw new CustomError(`글번호 ${boardId} 가 존재하지 않습니다.`,StatusCodes.CONFLICT);
+        }
+        if (boardUserId!==userInfo.id) {
+            throw new CustomError(`게시글 작성자가 아닙니다.`,StatusCodes.CONFLICT);
+        }
+        try {
+            // db에 저장
+            await  board.destroy(
+                {
+                    where: {id:boardId}
+                }
+            )
+            // await mintToken(userInfo.address, 1);
+            res.status(StatusCodes.OK).send({message: "ok"});
+        } catch (err) {
+            throw new Error(err);
+        }
+    }),
 
 
 }
