@@ -203,6 +203,35 @@ module.exports = {
             throw new Error(err);
         }
     }),
+    deleteToComment : asyncWrapper(async (req, res) => {
+        const commentData = await board.findOne({
+            where: {id: req.params.id},
+        });
+        const commentId = commentData.id
+        const commentUserId = commentData.userId
+        const decoded = await isAuthorized(req)
+        const userInfo = await user.findOne({
+            where: {id: decoded.id},
+        });
+        if (!commentData) {
+            throw new CustomError(`댓글번호 ${commentId} 가 존재하지 않습니다.`,StatusCodes.CONFLICT);
+        }
+        if (commentUserId!==userInfo.id) {
+            throw new CustomError(`댓글 작성자가 아닙니다.`,StatusCodes.CONFLICT);
+        }
+        try {
+            // db에 저장
+            await  comment.destroy(
+                {
+                    where: {id:commentId}
+                }
+            )
+            // await mintToken(userInfo.address, 1);
+            res.status(StatusCodes.OK).send({message: "ok"});
+        } catch (err) {
+            throw new Error(err);
+        }
+    }),
 
 
 }

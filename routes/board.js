@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const {write,getWritingById,getAllWriting,commentToWriting,edit,deleteToWriting} = require('../controllers/board');
+const {write,getWritingById,getAllWriting,commentToWriting,edit,deleteToWriting,deleteToComment} = require('../controllers/board');
 
 
 
@@ -9,7 +9,7 @@ router.get("/", getAllWriting);
 router.post("/comment/:id", commentToWriting);
 router.post("/edit/:id", edit);
 router.post("/delete/:id", deleteToWriting);
-
+router.post("/comment/delete/:id", deleteToComment);
 
 
 
