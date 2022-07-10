@@ -71,6 +71,29 @@ module.exports = {
         }
     }),
 
+
+    editPassword: asyncWrapper(async (req, res, next) => {
+        if (req.body.password === undefined ) {
+            throw new CustomError("올바르지 않은 파라미터 값입니다.",StatusCodes.CONFLICT);
+        } else {
+            try {
+                const decoded = await isAuthorized(req)
+                const salt = await bcrypt.genSalt(10);
+                const cryptPassword=bcrypt.hashSync(req.body.password, salt);
+                const userInfo = await user.findOne({
+                    where: {id: decoded.id},
+                });
+                await userInfo.update({
+                    password:cryptPassword
+                });
+                res.status(StatusCodes.OK).send({message: "ok"});
+            } catch (err) {
+                res.status(400).json({message: err.message});
+            }
+
+        }
+    }),
+
 }
 
 
