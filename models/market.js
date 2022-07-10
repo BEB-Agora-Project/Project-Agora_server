@@ -1,8 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
-// const { board } = require('./board');
 module.exports = (sequelize, DataTypes) => {
-  class comment extends Model {
+  class market extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -12,49 +11,53 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  comment.init(
+  market.init(
     {
-      category: {
-        type: DataTypes.INTEGER(10),
-        allowNull: false,
+      tokenId: {
+        type: DataTypes.INTEGER(30),
+        allowNull: true,
       },
-      content: {
+      tokenURI: {
         type: DataTypes.STRING(500),
         allowNull: false, //필수값
       },
-      up: {
+      price: {
         type: DataTypes.INTEGER(30),
-        allowNull: false,
+        allowNull: true, //필수값,
         defaultValue: 0,
       },
-      down: {
-        type: DataTypes.INTEGER(30),
+      owner: {
+        type: DataTypes.STRING(500),
         allowNull: false,
-        defaultValue: 0,
+        defaultValue: "server",
+      },
+      ownerAddress: {
+        type: DataTypes.STRING(500),
+        allowNull: false,
+        defaultValue: "serverAddress",
+      },
+      sold: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
     },
+
     {
       sequelize,
-      modelName: "comment",
+      modelName: "market",
       charset: "utf8",
       collate: "utf8_general_ci",
     }
   );
 
-  comment.associate = function (models) {
-    comment.belongsTo(models.board, {
-      foreignKey: "boardId",
-      targetKey: "id",
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    });
-    comment.belongsTo(models.user, {
+  market.associate = function (models) {
+    market.belongsTo(models.user, {
       foreignKey: "userId",
       targetKey: "id",
       onDelete: "cascade",
       onUpdate: "cascade",
     });
   };
-
-  return comment;
+  return market;
 };
