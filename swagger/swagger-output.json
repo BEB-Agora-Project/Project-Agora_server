@@ -113,6 +113,29 @@
         }
       }
     },
+    "/account/editPassword": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "description": "비밀번호를 변경한다.",
+        "parameters": [
+          {
+            "name": "password",
+            "in": "body",
+            "description": "유저 패스워드",
+            "required": true,
+            "schema": {
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/board/write": {
       "post": {
         "tags": [
