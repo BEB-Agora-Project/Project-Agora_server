@@ -20,11 +20,16 @@ module.exports = {
       //   neutralComment,
       //   disagreeComment,
       // ];
+      //우승댓글, 토론 가져오기
       const recentPost = await Debate.findAll({
         limit: 1,
         order: [["createdAt", "DESC"]],
       });
-      const postId = recentPost.id;
+      const winAgreeComments = (await Comment.findAll({limit : 1, order : [["up", "DESC"]],where : {category : 0}}))[0];
+      const winNeutralComments = (await Comment.findAll({limit : 1, order : [["up", "DESC"]],where : {category : 1}}))[0];
+      const winDisagreeComments = (await Comment.findAll({limit : 1, order : [["up", "DESC"]],where : {category : 2}}))[0];
+
+      const archivePost = [recentPost.id, recentPost.title, winAgreeComments.content, winNeutralComments.content, winDisagreeComments.content]
 
   
 
@@ -32,9 +37,7 @@ module.exports = {
       console.log("succesfully archived", result);
 
       //코멘트 우승자에게 토큰보상 DB로 기록해주기
-      const winAgreeComments = await Comment.findAll({limit : 1, order : [["up", "DESC"]],where : {category : 0}});
-      const winNeutralComments = await Comment.findAll({limit : 1, order : [["up", "DESC"]],where : {category : 0}});
-      const winDisagreeComments = await Comment.findAll({limit : 1, order : [["up", "DESC"]],where : {category : 0}});
+
 
       const agreeReward = (winAgreeComments.up - winAgreeComments.down) * winFactor;
       const neutralReward = (winNeutralComments.up - winNeutralComments.down) * winFactor;

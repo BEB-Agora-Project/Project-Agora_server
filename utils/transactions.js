@@ -14,6 +14,7 @@ const {
 } = process.env;
 const debateABI = require("../truffle/build/contracts/Debate.json").abi;
 const erc1155ABI = require("../truffle/build/contracts/AgoraTokens.json").abi;
+let nonce = 0;
 
 const caver = new Caver(PROVIDER);
 new caver.wallet.keyring.singleKeyring(SERVER_ADDRESS, SERVER_PRIVATE_KEY);
@@ -25,7 +26,19 @@ function findMethod(ABI, methodName) {
   }
 }
 
-async function sendTx(ABI, contractAddress, nonce, methodName, parameters) {
+async function sendTx(ABI, contractAddress, methodName, parameters) {
+  let _nonce = await caver.rpc.klay.getTransactionCount(
+    SERVER_ADDRESS,
+    "pending"
+  );
+
+  _nonce = caver.utils.hexToNumber(_nonce);
+
+  nonce = nonce > _nonce ? nonce : _nonce;
+  console.log(nonce);
+
+  nonce = caver.utils.numberToHex(nonce);
+
   const methodABI = findMethod(ABI, methodName); //ABI에서 원하는 method를 골라야됨
   const ABIencoded = caver.abi.encodeFunctionCall(methodABI, parameters);
   const options = {
@@ -39,10 +52,9 @@ async function sendTx(ABI, contractAddress, nonce, methodName, parameters) {
   //만약 send가 안되면 signedTx를 transaction.getRLPEncoding이용해 RLPEncode하도록
   const receipt = await caver.rpc.klay.sendRawTransaction(signedTx);
 
+  nonce++;
   return receipt;
 }
-
-let nonce = 0;
 
 module.exports = {
   tokenSettlement: async (mintList, burnList) => {
@@ -50,76 +62,38 @@ module.exports = {
     await mutex.runExclusive(async () => {
       //runExclusive always release locks
       //Below code prevents nonce hell
-      let _nonce = await caver.rpc.klay.getTransactionCount(
-        SERVER_ADDRESS,
-        "pending"
-      );
-      _nonce = ParseInt(_nonce, 16);
-
-      nonce = nonce > _nonce ? nonce : _nonce;
-      console.log(nonce);
-
-      const inputNonce = "0x" + nonce.toString(16);
 
       //parameters엔 업데이트 명단 들어감
       const result = await sendTx(
         erc1155ABI,
         ERC1155_ADDRESS,
-        inputNonce,
         "tokenMint",
         mintList
       );
-      nonce++;
     });
 
     //토큰을 많이써서 토큰을 태워야 하는사람들 처리
     await mutex.runExclusive(async () => {
-      let _nonce = await caver.rpc.klay.getTransactionCount(
-        SERVER_ADDRESS,
-        "pending"
-      );
-      _nonce = ParseInt(_nonce, 16);
-
-      nonce = nonce > _nonce ? nonce : _nonce;
-      console.log(nonce);
-
-      const inputNonce = "0x" + nonce.toString(16);
       const result = await sendTx(
         erc1155ABI,
         ERC1155_ADDRESS,
-        inputNonce,
         "tokenBurn",
         burnList
       );
-      nonce++;
     });
 
     //update DB expectedToken + currentToken => currentToken, expectedToken = 0
     //DB업데이트는 스케쥴러로 빼자, 여기서는 클레이튼 트랜잭션만 담당.
   },
-  nftBuy: async (buyer, tokenId, price) => {
+  nftBuy: async (buyInfo) => {
     await mutex.runExclusive(async () => {
-      let _nonce = await caver.rpc.klay.getTransactionCount(
-        SERVER_ADDRESS,
-        "pending"
-      );
-      _nonce = ParseInt(_nonce, 16);
-
-      nonce = nonce > _nonce ? nonce : _nonce;
-      console.log(nonce);
-
-      const inputNonce = "0x" + nonce.toString(16);
-
-      //parameters엔 구매자, 토큰아이디, 가격 들어감
-      const parameters = [buyer, tokenId, price];
+      //buyInfo엔 구매자, 토큰아이디, 가격 들어감
       const result = await sendTx(
         erc1155ABI,
         ERC1155_ADDRESS,
-        inputNonce,
         "buyNFT",
-        parameters
+        buyInfo
       );
-      nonce++;
 
       return result;
     });
@@ -127,27 +101,15 @@ module.exports = {
   archiveDebate: async () => {
     await mutex.runExclusive(async (archivePost) => {
       //runExclusive always release lock
-      let _nonce = await caver.rpc.klay.getTransactionCount(
-        SERVER_ADDRESS,
-        "pending"
-      );
-      _nonce = ParseInt(_nonce, 16);
-
-      nonce = nonce > _nonce ? nonce : _nonce;
-      console.log(nonce);
-
-      const inputNonce = "0x" + nonce.toString(16);
       //parameters는 DB에서 가장 최신 debate post 가져와서 해쉬화 해주도록 한다!
       const parameters = archivePost;
 
       const result = await sendTx(
         debateABI,
         DEBATE_ADDRESS,
-        inputNonce,
         "archiving",
         parameters
       );
-      nonce++;
 
       return result;
 

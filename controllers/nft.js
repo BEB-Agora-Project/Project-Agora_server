@@ -4,6 +4,7 @@ const User = require("../models/user");
 const getUserId = require("../utils/getUserId");
 const balanceCheck = require("../utils/balanceCheck");
 const { nftBuy } = require("../utils/transactions");
+const token = require("./token");
 
 module.exports = {
   nftList: async (req, res) => {
@@ -24,10 +25,12 @@ module.exports = {
 
     if (nftPrice > userBalance) return res.send("Not enough balance");
 
+    const parameters = [userAddress, tokenId, nftPrice];
+
     //토큰아이디 보내서 트랜잭션 실행
     res.send("Transaction Requested");
 
-    await nftBuy(userAddress, tokenId, nftPrice);
+    await nftBuy(parameters);
     //실행후 subscriber가 DB에 반영
   },
 };
