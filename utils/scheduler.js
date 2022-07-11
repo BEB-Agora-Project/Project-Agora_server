@@ -21,13 +21,12 @@ module.exports = {
       //   disagreeComment,
       // ];
       //우승댓글, 토론 가져오기
-      const recentPost = await Debate.findAll({
-        limit: 1,
+      const recentPost = await Debate.findOne({
         order: [["createdAt", "DESC"]],
       });
-      const winAgreeComments = (await Comment.findAll({limit : 1, order : [["up", "DESC"]],where : {category : 0}}))[0];
-      const winNeutralComments = (await Comment.findAll({limit : 1, order : [["up", "DESC"]],where : {category : 1}}))[0];
-      const winDisagreeComments = (await Comment.findAll({limit : 1, order : [["up", "DESC"]],where : {category : 2}}))[0];
+      const winAgreeComments = await Comment.findOne({order : [["up", "DESC"]],where : {category : 0}});
+      const winNeutralComments = await Comment.findOne({order : [["up", "DESC"]],where : {category : 1}});
+      const winDisagreeComments = await Comment.findOne({order : [["up", "DESC"]],where : {category : 2}});
 
       const archivePost = [recentPost.id, recentPost.title, winAgreeComments.content, winNeutralComments.content, winDisagreeComments.content]
 

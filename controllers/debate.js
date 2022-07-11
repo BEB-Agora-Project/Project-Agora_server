@@ -6,11 +6,7 @@ const User = require("../models/user");
 const Debate = require("../models/debate");
 const getUserId = require("../utils/getUserId");
 const balanceCheck = require("../utils/balanceCheck");
-const {
-  debateCommentReward,
-  upVotePrice,
-  downVotePrice,
-} = require("../config/rewardConfig");
+const { debateCommentReward, VotePrice } = require("../config/rewardConfig");
 
 //로그인 상태이므로 유저 Id알 수 있음
 //유저 Id로 코멘트에 조인시키기
@@ -50,29 +46,30 @@ module.exports = {
 
     const { commentId, upOrDown } = req.body;
     const userId = await getUserId(req);
+    const curBalance = await balanceCheck(userId);
+    if (curBalance < votePrice) return res.send("Not enough balance");
 
     const commentInfo = await Comment.findByPk(commentId);
     const userInfo = await User.findByPk(userId);
 
     let curUpVote = commentInfo.up;
+    let curDownVote = commentInfo.down;
     let todayVoteCount = userInfo.todayVote;
     let expectedToken = userInfo.expectedToken;
 
-    const votePrice = upVotePrice ** todayVoteCount;
+    const votePrice = VotePrice ** todayVoteCount;
     //오늘 투표한 횟수에따라 지수적으로 비용 증가
 
-    const curBalance = await balanceCheck(userId);
-    if (curBalance < votePrice) return res.send("Not enough balance");
     //현재 토큰 보유량 확인하고 부족하면 거절
 
     if (upOrDown === "up") {
       commentInfo.up = ++curUpVote;
-      commentInfo.save();
+      await commentInfo.save();
       //upVote 반영
     } else {
-      commentInfo.up = --curUpVote;
-      commentInfo.save();
-      //upVote 반영
+      commentInfo.down = --curDownVote;
+      await commentInfo.save();
+      //downVote 반영
     }
 
     todayVoteCount++;
@@ -81,7 +78,7 @@ module.exports = {
 
     let reducedToken = expectedToken - votePrice;
     userInfo.expectedToken = reducedToken;
-    userInfo.save();
+    await userInfo.save();
     //소모한 토큰 반영, 음수로 갈 수 있음
 
     return res.send("OK");
@@ -92,14 +89,13 @@ module.exports = {
     return res.send(allPost);
   },
   currentDebate: async (req, res) => {
-    const recentPost = await Debate.findAll({
-      limit: 1,
+    const recentPost = await Debate.findOne({
       order: [["createdAt", "DESC"]],
     });
     //어떻게 코멘트를 같이 가져오지?
     const postId = recentPost.id;
     //foreignKey를 이렇게 쓰는건지 모르겠음
-    const comments = await Comment.findAll({ boardId: postId });
+    const comments = await Comment.findAll({ debateId: postId });
 
     const result = { post: recentPost, comments: comments };
 

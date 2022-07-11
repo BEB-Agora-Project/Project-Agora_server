@@ -54,6 +54,12 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "cascade",
       onUpdate: "cascade",
     });
+    comment.belongsTo(models.debate, {
+      foreignKey: "debateId",
+      targetKey: "id",
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    });
   };
 
   return comment;

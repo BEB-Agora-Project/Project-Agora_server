@@ -52,6 +52,7 @@ async function sendTx(ABI, contractAddress, methodName, parameters) {
   //만약 send가 안되면 signedTx를 transaction.getRLPEncoding이용해 RLPEncode하도록
   const receipt = await caver.rpc.klay.sendRawTransaction(signedTx);
 
+  nonce = caver.utils.hexToNumber(nonce);
   nonce++;
   return receipt;
 }
