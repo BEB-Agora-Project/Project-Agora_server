@@ -4,7 +4,6 @@
 require("dotenv").config();
 const { Mutex } = require("async-mutex");
 const Caver = require("caver-js");
-const debate = require("../models/debate");
 const {
   SERVER_ADDRESS,
   SERVER_PRIVATE_KEY,

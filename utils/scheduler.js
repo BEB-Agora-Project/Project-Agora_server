@@ -2,7 +2,8 @@
 const { Op } = require("sequelize");
 const User = require("../models/user");
 const Debate = require("../models/debate");
-const Comment = require("../models/comment");
+const Post = require("../models/comment");
+const Post = require("../models/post")
 const cron = require("node-cron");
 const { archiveDebate, tokenSettlement } = require("./transactions");
 const {winFactor} = require("../config/rewardConfig");
@@ -21,42 +22,42 @@ module.exports = {
       //   disagreeComment,
       // ];
       //우승댓글, 토론 가져오기
-      const recentPost = await Debate.findOne({
-        order: [["createdAt", "DESC"]],
+      const recentDebate = await Debate.findOne({
+        order: [["created_at", "DESC"]],
       });
-      const winAgreeComments = await Comment.findOne({order : [["up", "DESC"]],where : {category : 0}});
-      const winNeutralComments = await Comment.findOne({order : [["up", "DESC"]],where : {category : 1}});
-      const winDisagreeComments = await Comment.findOne({order : [["up", "DESC"]],where : {category : 2}});
+      const winAgreePost = await Post.findOne({order : [["up", "DESC"]],where : {opinion : 0}});
+      const winNeutralPost = await Post.findOne({order : [["up", "DESC"]],where : {opinion : 1}});
+      const winDisagreePost = await Post.findOne({order : [["up", "DESC"]],where : {opinion : 2}});
 
-      const archivePost = [recentPost.id, recentPost.title, winAgreeComments.content, winNeutralComments.content, winDisagreeComments.content]
+      const archivePost = [recentDebate.id, recentDebate.title, winAgreePost.content, winNeutralPost.content, winDisagreePost.content]
 
   
-
+      //스마트컨트랙트 스트링받도록 수정
       const archiveResult = await archiveDebate(archivePost); 
       console.log("succesfully archived", result);
 
       //코멘트 우승자에게 토큰보상 DB로 기록해주기
 
 
-      const agreeReward = (winAgreeComments.up - winAgreeComments.down) * winFactor;
-      const neutralReward = (winNeutralComments.up - winNeutralComments.down) * winFactor;
-      const disagreeReward = (winDisagreeComments.up - winDisagreeComments.down) * winFactor;
+      const agreeReward = (winAgreePost.up - winAgreePost.down) * winFactor;
+      const neutralReward = (winNeutralPost.up - winNeutralPost.down) * winFactor;
+      const disagreeReward = (winDisagreePost.up - winDisagreePost.down) * winFactor;
 
-      const agreeUserId = winAgreeComments.userId;
-      const neutralUserId = winNeutralComments.userId;
-      const disagreeUserId = winDisagreeComments.userId;
+      const agreeUserId = winAgreePost.user_id;
+      const neutralUserId = winNeutralPost.user_id;
+      const disagreeUserId = winDisagreePost.user_id;
 
       let agreeUser = await User.findByPk(agreeUserId);
       let neutralUser = await User.findByPk(neutralUserId);
       let disagreeUser = await User.findByPk(disagreeUserId);
 
-      agreeUser.expectedToken += agreeReward;
-      neutralUser.expectedToken += neutralReward;
-      disagreeUser.expectedToken += disagreeReward;
+      agreeUser.expected_token += agreeReward;
+      neutralUser.expected_token += neutralReward;
+      disagreeUser.expected_token += disagreeReward;
 
-      agreeUser.save();
-      neutralUser.save();
-      disagreeUser.save();
+      await agreeUser.save();
+      await neutralUser.save();
+      await disagreeUser.save();
       //DB Reward Done
 
       //새 토론 주제 설정, 걍 DB에 debateList.js에서 꺼내온담에 제일 최신으로 넣어주기.
@@ -78,19 +79,19 @@ module.exports = {
       //정산후 DB업데이트
 
       //어차피 나중에 업데이트할거니까 싹다 가져옴
-      const attributes = ["address", "expectedToken"];
-        const mintList = await User.findAll({where : {expectedToken : {[Op.gt]: 0}}, attributes : attributes});
-        const burnList = await User.findAll({where : {expectedToken : {[Op.lt]: 0}}, attributes : attributes});
+      const attributes = ["address", "expected_token"];
+        const mintList = await User.findAll({where : {expected_token : {[Op.gt]: 0}}, attributes : attributes});
+        const burnList = await User.findAll({where : {expected_token : {[Op.lt]: 0}}, attributes : attributes});
         //DB에서 어떻게 돌아오는지 확인하고 트랜잭션 모듈에서 바로 쓸수있게 바꾸기
         let mintUserList = [[],[]];
         mintList.forEach(el => {
           mintUserList[0].push(el.address);
-          mintUserList[1].push(el.expectedToken);
+          mintUserList[1].push(el.expected_token);
         })
         let burnUserList = [[],[]];
         burnList.forEach(el => {
           burnUserList[0].push(el.address);
-          burnUserList[1].push(el.expectedToken);
+          burnUserList[1].push(el.expected_token);
         })
 
 
@@ -102,10 +103,10 @@ module.exports = {
         let allUser = await User.findAll();
         for(let i = 0 ; i < allUser.length ; i++ ) {
           let user = allUser[i];
-          let settledToken = user.currentToken + user.expectedToken;
-          user.currentToken = settledToken;
-          user.expectedToken = 0;
-          user.save();
+          let settledToken = user.current_token + user.expected_token;
+          user.current_token = settledToken;
+          user.expected_token = 0;
+          await user.save();
         }
 
     });

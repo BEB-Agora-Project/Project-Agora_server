@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class user extends Model {
+  class User extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,13 +11,9 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  user.init(
+  User.init(
     {
-      email: {
-        type: DataTypes.STRING(30),
-        allowNull: false, //필수값
-      },
-      userName: {
+      username: {
         type: DataTypes.STRING(30),
         allowNull: false, //필수값
       },
@@ -25,30 +21,34 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: false, //필수값
       },
+      email: {
+        type: DataTypes.STRING(30),
+        allowNull: false, //필수값
+      },
       address: {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
-      privateKey: {
+      private_key: {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
-      currentToken: {
+      current_token: {
         type: DataTypes.INTEGER(100),
         allowNull: false,
         defaultValue: 0,
       },
-      expectedToken: {
+      expected_token: {
         type: DataTypes.INTEGER(100),
         allowNull: false,
         defaultValue: 0,
       },
-      todayVote: {
+      today_vote_count: {
         type: DataTypes.INTEGER(100),
         allowNull: false,
         defaultValue: 0,
       },
-      todayLogin: {
+      today_login: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
@@ -56,30 +56,30 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "user",
+      modelName: "User",
       charset: "utf8",
       collate: "utf8_general_ci",
     }
   );
-  user.associate = function (models) {
-    user.hasMany(models.board, {
-      foreignKey: "userId",
+  User.associate = function (models) {
+    User.hasMany(models.Post, {
+      foreignKey: "user_id",
       sourceKey: "id",
       onDelete: "cascade",
       onUpdate: "cascade",
     });
-    user.hasMany(models.comment, {
-      foreignKey: "userId",
+    User.hasMany(models.Comment, {
+      foreignKey: "user_id",
       sourceKey: "id",
       onDelete: "cascade",
       onUpdate: "cascade",
     });
-    user.hasMany(models.market, {
-      foreignKey: "userId",
+    User.hasMany(models.MarketItem, {
+      foreignKey: "user_id",
       sourceKey: "id",
       onDelete: "cascade",
       onUpdate: "cascade",
     });
   };
-  return user;
+  return User;
 };

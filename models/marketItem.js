@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class market extends Model {
+  class MarketItem extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,13 +11,13 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  market.init(
+  MarketItem.init(
     {
-      tokenId: {
+      token_id: {
         type: DataTypes.INTEGER(30),
         allowNull: true,
       },
-      tokenURI: {
+      token_URI: {
         type: DataTypes.STRING(500),
         allowNull: false, //필수값
       },
@@ -25,16 +25,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER(30),
         allowNull: true, //필수값,
         defaultValue: 0,
-      },
-      owner: {
-        type: DataTypes.STRING(500),
-        allowNull: false,
-        defaultValue: "server",
-      },
-      ownerAddress: {
-        type: DataTypes.STRING(500),
-        allowNull: false,
-        defaultValue: "serverAddress",
       },
       sold: {
         type: DataTypes.BOOLEAN,
@@ -45,19 +35,19 @@ module.exports = (sequelize, DataTypes) => {
 
     {
       sequelize,
-      modelName: "market",
+      modelName: "MarketItem",
       charset: "utf8",
       collate: "utf8_general_ci",
     }
   );
 
-  market.associate = function (models) {
-    market.belongsTo(models.user, {
-      foreignKey: "userId",
+  MarketItem.associate = function (models) {
+    MarketItem.belongsTo(models.User, {
+      foreignKey: "user_id",
       targetKey: "id",
       onDelete: "cascade",
       onUpdate: "cascade",
     });
   };
-  return market;
+  return MarketItem;
 };

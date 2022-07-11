@@ -25,15 +25,15 @@ module.exports = {
     await Comment.create({
       category: category,
       content: content,
-      debateId: debateId,
-      userId: userId,
+      debate_id: debateId,
+      user_id: userId,
     });
     //user,debate에 연결시켜 코멘트 작성
 
     const userInfo = await User.findByPk(userId);
-    let curTokenBalance = userInfo.expectedToken;
+    let curTokenBalance = userInfo.expected_token;
     const rewardedTokenBalance = curTokenBalance + debateCommentReward;
-    userInfo.expectedToken = rewardedTokenBalance;
+    userInfo.expected_token = rewardedTokenBalance;
 
     await userInfo.save();
     //DB에 토큰 보상 지급
@@ -54,8 +54,8 @@ module.exports = {
 
     let curUpVote = commentInfo.up;
     let curDownVote = commentInfo.down;
-    let todayVoteCount = userInfo.todayVote;
-    let expectedToken = userInfo.expectedToken;
+    let todayVoteCount = userInfo.today_vote_count;
+    let expectedToken = userInfo.expected_token;
 
     const votePrice = VotePrice ** todayVoteCount;
     //오늘 투표한 횟수에따라 지수적으로 비용 증가
@@ -95,7 +95,7 @@ module.exports = {
     //어떻게 코멘트를 같이 가져오지?
     const postId = recentPost.id;
     //foreignKey를 이렇게 쓰는건지 모르겠음
-    const comments = await Comment.findAll({ debateId: postId });
+    const comments = await Comment.findAll({ where: { debateId: postId } });
 
     const result = { post: recentPost, comments: comments };
 

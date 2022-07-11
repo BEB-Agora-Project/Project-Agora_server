@@ -2,7 +2,7 @@
 const { Model } = require("sequelize");
 // const { board } = require('./board');
 module.exports = (sequelize, DataTypes) => {
-  class comment extends Model {
+  class Comment extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -12,12 +12,8 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  comment.init(
+  Comment.init(
     {
-      category: {
-        type: DataTypes.INTEGER(10),
-        allowNull: false,
-      },
       content: {
         type: DataTypes.STRING(500),
         allowNull: false, //필수값
@@ -35,32 +31,26 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "comment",
+      modelName: "Comment",
       charset: "utf8",
       collate: "utf8_general_ci",
     }
   );
 
-  comment.associate = function (models) {
-    comment.belongsTo(models.board, {
-      foreignKey: "boardId",
+  Comment.associate = function (models) {
+    Comment.belongsTo(models.Post, {
+      foreignKey: "post_id",
       targetKey: "id",
       onDelete: "cascade",
       onUpdate: "cascade",
     });
-    comment.belongsTo(models.user, {
-      foreignKey: "userId",
-      targetKey: "id",
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    });
-    comment.belongsTo(models.debate, {
-      foreignKey: "debateId",
+    Comment.belongsTo(models.User, {
+      foreignKey: "user_id",
       targetKey: "id",
       onDelete: "cascade",
       onUpdate: "cascade",
     });
   };
 
-  return comment;
+  return Comment;
 };
