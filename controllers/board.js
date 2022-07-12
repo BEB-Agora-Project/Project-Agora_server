@@ -147,11 +147,10 @@ module.exports = {
         if (req.body.content === undefined) {
             throw new CustomError("올바르지 않은 파라미터 값입니다.",StatusCodes.CONFLICT);
         }
-        const {content} = req.body;
+        const {postId,content} = req.body;
         const postData = await Post.findOne({
             where: {id: req.params.id},
         });
-        const postId = postData.id
         const decoded = await isAuthorized(req)
         if (!postData) {
             throw new CustomError(`글번호 ${postId} 가 존재하지 않습니다.`,StatusCodes.CONFLICT);

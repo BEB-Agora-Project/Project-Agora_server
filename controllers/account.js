@@ -27,25 +27,20 @@ module.exports = {
                 id: userInfo.id,
                 email: userInfo.email,
                 username: userInfo.username,
-                token: userInfo.token,
-                created_at: userInfo.created_at,
-                updated_at: userInfo.updated_at
+                address: userInfo.address,
+                privateKey: userInfo.private_key,
+                currentToken: userInfo.current_token,
+                expectedToken: userInfo.expected_token
             }
-            sendAccessToken(res, await generateAccessToken(payload))
             if(userInfo.today_login===false){
                 // await mintToken(userInfo.address, 5);
                 await userInfo.update({
                     today_login: true,
                 })
             }
-            res.status(StatusCodes.OK).send({message: "ok"})
+            res.status(StatusCodes.OK).send({message: "ok",data:{accessToken: await generateAccessToken(payload)}})
         }
     }),
-
-    signOut: (req, res) => {
-        res.clearCookie('jwt')
-        res.status(StatusCodes.OK).send("로그아웃 되었습니다.");
-    },
     signUp: asyncWrapper(async (req, res, next) => {
         if (req.body.email === undefined || req.body.password === undefined || req.body.username === undefined ) {
             throw new CustomError("올바르지 않은 파라미터 값입니다.",StatusCodes.CONFLICT);
@@ -78,6 +73,7 @@ module.exports = {
         } else {
             try {
                 const decoded = await isAuthorized(req)
+                console.log(decoded)
                 const salt = await bcrypt.genSalt(10);
                 const cryptPassword=bcrypt.hashSync(req.body.password, salt);
                 const userInfo = await User.findOne({
