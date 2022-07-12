@@ -29,7 +29,7 @@
     }
   },
   "paths": {
-    "/account/signIn": {
+    "/account/signin": {
       "post": {
         "tags": [
           "account"
@@ -219,10 +219,12 @@
         "description": "게시글에 대한 댓글을 작성한다.",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
+            "name": "postId",
+            "in": "body",
+            "description": "게시글 아이디",
             "required": true,
-            "type": "string"
+            "schema": {
+            }
           },
           {
             "name": "content",

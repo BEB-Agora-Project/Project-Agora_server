@@ -3,13 +3,13 @@ const {write,getWritingById,getAllWriting,commentToWriting,edit,deleteToWriting,
 
 
 
-router.post('/write', write);
-router.get("/:id", getWritingById);
-router.get("/", getAllWriting);
-router.post("/comment/:id", commentToWriting);
-router.post("/edit/:id", edit);
-router.post("/delete/:id", deleteToWriting);
-router.post("/comment/delete/:id", deleteToComment);
+router.post('/posts', write);
+router.get("/posts/:id", getWritingById);
+router.get("/posts", getAllWriting);
+router.post("/comments", commentToWriting); // todo: body에 postId를 전달
+router.put("/posts/:id", edit);
+router.delete("/posts/:id", deleteToWriting);
+router.delete("/comments/:id", deleteToComment);
 
 
 
