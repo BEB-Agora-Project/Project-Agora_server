@@ -52,6 +52,11 @@ module.exports = (sequelize, DataTypes) => {
                 type:DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false
+            },
+            is_auth: {
+                type:DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
             }
         },
         {

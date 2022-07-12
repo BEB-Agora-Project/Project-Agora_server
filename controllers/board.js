@@ -8,7 +8,7 @@ const StatusCodes = require("http-status-codes")
 module.exports = {
     writePost: asyncWrapper(async (req, res) => {
         if (req.body.title === undefined || req.body.content === undefined) {
-            throw new CustomError("올바르지 않은 파라미터 값입니다.",StatusCodes.CONFLICT);
+            throw new CustomError("올바르지 않은 파라미터 값입니다.", StatusCodes.CONFLICT);
         }
         const decoded = await isAuthorized(req)
         const userInfo = await User.findOne({
@@ -24,23 +24,19 @@ module.exports = {
             throw new CustomError("올바르지 않은 파라미터 값입니다.", StatusCodes.CONFLICT);
         }
         const newPost = new Post({
-            title:title,
-            content:content,
-            user_id:userId
+            title: title,
+            content: content,
+            user_id: userId
         });
-        try {
-            // db에 저장
-            const createdPost = await newPost.save();
-            // await mintToken(userInfo.address, 5);
-            res.status(StatusCodes.CREATED).json({status: "success", data: {postId: createdPost.id}});
-        } catch (err) {
-            throw new Error(err);
-        }
+        // db에 저장
+        const createdPost = await newPost.save();
+        // await mintToken(userInfo.address, 5);
+        res.status(StatusCodes.CREATED).json({status: "success", data: {postId: createdPost.id}});
     }),
 
-    editPost : asyncWrapper(async (req, res) => {
+    editPost: asyncWrapper(async (req, res) => {
         if (req.body.title === undefined || req.body.content === undefined) {
-            throw new CustomError("올바르지 않은 파라미터 값입니다.",StatusCodes.CONFLICT);
+            throw new CustomError("올바르지 않은 파라미터 값입니다.", StatusCodes.CONFLICT);
         }
         const decoded = await isAuthorized(req)
         const userInfo = await User.findOne({
@@ -51,21 +47,45 @@ module.exports = {
             where: {id: req.params.id},
         });
         if (!postData) {
-            throw new CustomError(`글번호 ${req.params.id} 가 존재하지 않습니다.`,StatusCodes.CONFLICT);
+            throw new CustomError(`글번호 ${req.params.id} 가 존재하지 않습니다.`, StatusCodes.CONFLICT);
         }
 
 
-
-        if(!postData.user_id===userId){
-            throw new CustomError(`올바른 사용자가 아닙니다`,StatusCodes.CONFLICT);
+        if (!postData.user_id === userId) {
+            throw new CustomError(`올바른 사용자가 아닙니다`, StatusCodes.CONFLICT);
         }
-        const {title,content} = req.body;
+        const {title, content} = req.body;
         await postData.update({
-            title:title,
+            title: title,
             content: content
         });
         res.status(StatusCodes.OK).send({message: "ok"});
     }),
+
+    editComment: asyncWrapper(async (req, res) => {
+        if (req.body.content === undefined) {
+            throw new CustomError("올바르지 않은 파라미터 값입니다.", StatusCodes.CONFLICT);
+        }
+        const decoded = await isAuthorized(req)
+        const userInfo = await User.findOne({
+            where: {id: decoded.id},
+        });
+        const userId = userInfo.id
+        const commentData = await Comment.findOne({
+            where: {id: req.params.id},
+        });
+        if (!commentData) {
+            throw new CustomError(`댓글번호 ${req.params.id} 가 존재하지 않습니다.`, StatusCodes.CONFLICT);
+        }
+        if (!commentData.user_id === userId) {
+            throw new CustomError(`올바른 사용자가 아닙니다`, StatusCodes.CONFLICT);
+        }
+        await commentData.update({
+            content: req.body.content
+        });
+        res.status(StatusCodes.OK).send({message: "ok"});
+    }),
+
 
     /*
   Writing ID를 받아서 해당 writing에 대한 정보를 응답
@@ -94,7 +114,7 @@ module.exports = {
                 }
             ],
             where: {post_id: postData.id},
-            });
+        });
 
         res.status(200).json({
             status: "success",
@@ -124,7 +144,7 @@ module.exports = {
                     const comments = await Comment.findAndCountAll({
                         where: {post_id: id},
                     });
-                    const commentsCount= comments.count
+                    const commentsCount = comments.count
                     return {
                         id,
                         title,
@@ -143,33 +163,29 @@ module.exports = {
         });
     }),
 
-    writeComment : asyncWrapper(async (req, res) => {
+    writeComment: asyncWrapper(async (req, res) => {
         if (req.body.content === undefined) {
-            throw new CustomError("올바르지 않은 파라미터 값입니다.",StatusCodes.CONFLICT);
+            throw new CustomError("올바르지 않은 파라미터 값입니다.", StatusCodes.CONFLICT);
         }
-        const {postId,content} = req.body;
+        const {postId, content} = req.body;
         const postData = await Post.findOne({
             where: {id: postId},
         });
         const decoded = await isAuthorized(req)
         if (!postData) {
-            throw new CustomError(`글번호 ${postId} 가 존재하지 않습니다.`,StatusCodes.CONFLICT);
+            throw new CustomError(`글번호 ${postId} 가 존재하지 않습니다.`, StatusCodes.CONFLICT);
         }
         const newComment = new Comment({
-            content:content,
+            content: content,
             user_id: decoded.id,
-            post_id:postId
+            post_id: postId
         });
-        try {
-            // db에 저장
-            const createdComment = await newComment.save();
-            // await mintToken(userInfo.address, 1);
-            res.status(StatusCodes.CREATED).json({status: "success", data: {commentId: createdComment.id}});
-        } catch (err) {
-            throw new Error(err);
-        }
+        // db에 저장
+        const createdComment = await newComment.save();
+        // await mintToken(userInfo.address, 1);
+        res.status(StatusCodes.CREATED).json({status: "success", data: {commentId: createdComment.id}});
     }),
-    deletePost : asyncWrapper(async (req, res) => {
+    deletePost: asyncWrapper(async (req, res) => {
 
         const postData = await Post.findOne({
             where: {id: req.params.id},
@@ -181,25 +197,21 @@ module.exports = {
             where: {id: decoded.id},
         });
         if (!postData) {
-            throw new CustomError(`글번호 ${postId} 가 존재하지 않습니다.`,StatusCodes.CONFLICT);
+            throw new CustomError(`글번호 ${postId} 가 존재하지 않습니다.`, StatusCodes.CONFLICT);
         }
-        if (postUserId!==userInfo.id) {
-            throw new CustomError(`게시글 작성자가 아닙니다.`,StatusCodes.CONFLICT);
+        if (postUserId !== userInfo.id) {
+            throw new CustomError(`게시글 작성자가 아닙니다.`, StatusCodes.CONFLICT);
         }
-        try {
-            // db에 저장
-            await  Post.destroy(
-                {
-                    where: {id:postId}
-                }
-            )
-            // await mintToken(userInfo.address, 1);
-            res.status(StatusCodes.OK).send({message: "ok"});
-        } catch (err) {
-            throw new Error(err);
-        }
+        // db에 저장
+        await Post.destroy(
+            {
+                where: {id: postId}
+            }
+        )
+        // await mintToken(userInfo.address, 1);
+        res.status(StatusCodes.OK).send({message: "ok"});
     }),
-    deleteComment : asyncWrapper(async (req, res) => {
+    deleteComment: asyncWrapper(async (req, res) => {
         const commentData = await Post.findOne({
             where: {id: req.params.id},
         });
@@ -210,23 +222,19 @@ module.exports = {
             where: {id: decoded.id},
         });
         if (!commentData) {
-            throw new CustomError(`댓글번호 ${commentId} 가 존재하지 않습니다.`,StatusCodes.CONFLICT);
+            throw new CustomError(`댓글번호 ${commentId} 가 존재하지 않습니다.`, StatusCodes.CONFLICT);
         }
-        if (commentUserId!==userInfo.id) {
-            throw new CustomError(`댓글 작성자가 아닙니다.`,StatusCodes.CONFLICT);
+        if (commentUserId !== userInfo.id) {
+            throw new CustomError(`댓글 작성자가 아닙니다.`, StatusCodes.CONFLICT);
         }
-        try {
-            // db에 저장
-            await  Comment.destroy(
-                {
-                    where: {id:commentId}
-                }
-            )
-            // await mintToken(userInfo.address, 1);
-            res.status(StatusCodes.OK).send({message: "ok"});
-        } catch (err) {
-            throw new Error(err);
-        }
+        // db에 저장
+        await Comment.destroy(
+            {
+                where: {id: commentId}
+            }
+        )
+        // await mintToken(userInfo.address, 1);
+        res.status(StatusCodes.OK).send({message: "ok"});
     }),
 
 
