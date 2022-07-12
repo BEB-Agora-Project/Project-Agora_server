@@ -1,7 +1,8 @@
 'use strict';
 const { Model } = require('sequelize');
+// const { board } = require('./board');
 module.exports = (sequelize, DataTypes) => {
-    class board extends Model {
+    class Comment extends Model {
         /**
          * Helper method for defining associations.
          * This method is not a part of Sequelize lifecycle.
@@ -11,18 +12,18 @@ module.exports = (sequelize, DataTypes) => {
             // define association here
         }
     }
-    board.init(
+    Comment.init(
         {
-            title: {
-                type:DataTypes.STRING(30),
-                // 자주사용되는 자료형 STRING, TEXT, BOOLEAN, INTEGER, FLOAT, DATETIME
-                allowNull: false, //필수값
-            },
             content: {
                 type:DataTypes.STRING(500),
                 allowNull: false, //필수값
             },
-            hit: {
+            up: {
+                type:DataTypes.INTEGER(30),
+                allowNull: true, //필수값,
+                defaultValue: 0
+            },
+            down: {
                 type:DataTypes.INTEGER(30),
                 allowNull: true, //필수값,
                 defaultValue: 0
@@ -30,25 +31,27 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             sequelize,
-            modelName: 'board',
+            modelName: 'Comment',
             charset: 'utf8',
-            collate: 'utf8_general_ci'
+            collate: 'utf8_general_ci',
+            underscored:true
         }
     );
 
-
-    board.associate = function (models) {
-        board.belongsTo(models.user, {
-            foreignKey: "userId",
+    Comment.associate = function(models){
+        Comment.belongsTo(models.Post, {
+            foreignKey: "post_id",
+            targetKey: "id",
+            onDelete: 'cascade',
+            onUpdate: 'cascade'
+        });
+        Comment.belongsTo(models.User, {
+            foreignKey: "user_id",
             targetKey: "id",
             onDelete: 'cascade',
             onUpdate: 'cascade'
         })
-        board.hasMany(models.comment,{
-            foreignKey: "boardId",
-            sourceKey: "id",
-            onDelete: 'cascade',
-            onUpdate: 'cascade'});
     };
-    return board;
+
+    return Comment;
 };
