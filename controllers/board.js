@@ -6,7 +6,7 @@ const {asyncWrapper} = require("../errors/async");
 const CustomError = require("../errors/custom-error");
 const StatusCodes = require("http-status-codes")
 module.exports = {
-    write: asyncWrapper(async (req, res) => {
+    writePost: asyncWrapper(async (req, res) => {
         if (req.body.title === undefined || req.body.content === undefined) {
             throw new CustomError("올바르지 않은 파라미터 값입니다.",StatusCodes.CONFLICT);
         }
@@ -38,7 +38,7 @@ module.exports = {
         }
     }),
 
-    edit : asyncWrapper(async (req, res) => {
+    editPost : asyncWrapper(async (req, res) => {
         if (req.body.title === undefined || req.body.content === undefined) {
             throw new CustomError("올바르지 않은 파라미터 값입니다.",StatusCodes.CONFLICT);
         }
@@ -64,13 +64,13 @@ module.exports = {
             title:title,
             content: content
         });
-        res.status(StatusCodes.OK).json({status: "success", data: {post_id: postData.id}});
+        res.status(StatusCodes.OK).send({message: "ok"});
     }),
 
     /*
   Writing ID를 받아서 해당 writing에 대한 정보를 응답
 */
-    getWritingById: asyncWrapper(async (req, res) => {
+    getPost: asyncWrapper(async (req, res) => {
         //전달받은 id를 가진 writing을 찾아옴
         const postData = await Post.findOne({
             where: {id: req.params.id},
@@ -111,7 +111,7 @@ module.exports = {
         });
     }),
 
-    getAllWriting: asyncWrapper(async (req, res) => {
+    getPostsList: asyncWrapper(async (req, res) => {
         const writings = await Post.findAll();
         // Array에 map을 돌 때 콜백함수가 비동기면 일반적인 방법으로는 구현이 안됨
         // 그래서 Promise.all을 사용함
@@ -143,13 +143,13 @@ module.exports = {
         });
     }),
 
-    commentToWriting : asyncWrapper(async (req, res) => {
+    writeComment : asyncWrapper(async (req, res) => {
         if (req.body.content === undefined) {
             throw new CustomError("올바르지 않은 파라미터 값입니다.",StatusCodes.CONFLICT);
         }
         const {postId,content} = req.body;
         const postData = await Post.findOne({
-            where: {id: req.params.id},
+            where: {id: postId},
         });
         const decoded = await isAuthorized(req)
         if (!postData) {
@@ -169,7 +169,7 @@ module.exports = {
             throw new Error(err);
         }
     }),
-    deleteToWriting : asyncWrapper(async (req, res) => {
+    deletePost : asyncWrapper(async (req, res) => {
 
         const postData = await Post.findOne({
             where: {id: req.params.id},
@@ -199,7 +199,7 @@ module.exports = {
             throw new Error(err);
         }
     }),
-    deleteToComment : asyncWrapper(async (req, res) => {
+    deleteComment : asyncWrapper(async (req, res) => {
         const commentData = await Post.findOne({
             where: {id: req.params.id},
         });
