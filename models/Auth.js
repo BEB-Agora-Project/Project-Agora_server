@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             sequelize,
-            modelName: 'EmailAuth',
+            modelName: 'Auth',
             charset: 'utf8',
             collate: 'utf8_general_ci',
             underscored:true

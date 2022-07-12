@@ -42,7 +42,7 @@ module.exports = {
             from: process.env.NODEMAILER_USER,
             to: sendEmail,
             subject: "[Agora]비밀번호 찾기 관련 이메일 입니다",
-            test: `임시 비밀번호는 "${newPassword}" 입니다.`
+            text: `임시 비밀번호는 "${newPassword}" 입니다.`
 
         };
         await smtpTransport.sendMail(mailOptions, (error, responses) => {

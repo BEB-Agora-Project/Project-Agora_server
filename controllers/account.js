@@ -7,7 +7,7 @@ const Caver = require('caver-js')
 const caver = new Caver('https://api.baobab.klaytn.net:8651/')
 // const {mintToken} = require('./smartContract')
 const bcrypt = require('bcrypt');
-const {sendMailAuth} = require('../middleware/mailer');
+const {sendMailAuth,sendNewPassword} = require('../middleware/mailer');
 
 module.exports = {
 
@@ -20,9 +20,12 @@ module.exports = {
         const userInfo = await User.findOne({
             where: {email: email},
         });
+        if (!userInfo) {
+            throw new CustomError("존재하지 않는 계정입니다.", StatusCodes.NOT_FOUND);
+        }
         const validPassword = await bcrypt.compare(password, userInfo.password);
         if (!validPassword) {
-            throw new CustomError("존재하지 않는 사용자입니다.", StatusCodes.NOT_FOUND);
+            throw new CustomError("비밀번호가 잘못되었습니다.", StatusCodes.NOT_FOUND);
         }
         if (!userInfo.is_auth) {
             throw new CustomError("이메일 인증을 완료해 주세요!", StatusCodes.UNAUTHORIZED);
@@ -113,6 +116,28 @@ module.exports = {
                 password: cryptPassword
             });
             res.status(StatusCodes.OK).send({message: "ok"});
+        }
+    }),
+
+    findPassword: asyncWrapper(async (req, res, next) => {
+        if (req.body.email === undefined ||req.body.username === undefined) {
+            throw new CustomError("올바르지 않은 파라미터 값입니다.", StatusCodes.CONFLICT);
+        } else {
+            const userInfo = await User.findOne({
+                where: {email: req.body.email, username:req.body.username},
+            });
+            if (!userInfo) {
+                throw new CustomError("잘못된 유저이름이거나, 존재하지 않는 사용자입니다.", StatusCodes.NOT_FOUND);
+            }else{
+                const tempPassword = Math.random().toString(36).slice(2);
+                const salt = await bcrypt.genSalt(10);
+                const cryptPassword = bcrypt.hashSync(tempPassword, salt);
+                await userInfo.update({
+                    password: cryptPassword
+                });
+                await sendNewPassword(req.body.email, tempPassword)
+                res.status(StatusCodes.OK).send({message: "등록하신 이메일로 임시 비밀번호가 발송되었습니다."});
+            }
         }
     }),
 
