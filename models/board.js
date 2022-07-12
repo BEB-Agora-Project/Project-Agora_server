@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   Board.init(
     {
       boardname: {
-        type: DataTypes.STRING(500),
+        type: DataTypes.STRING(30),
         allowNull: false, //필수값
       },
     },
@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Board.associate = function (models) {
-    Board.hasMany(models.Post, {
+    Board.hasOne(models.Post, {
       foreignKey: "board_id",
       sourceKey: "id",
       onDelete: "cascade",

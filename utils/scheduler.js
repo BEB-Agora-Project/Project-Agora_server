@@ -7,6 +7,7 @@ const Post = require("../models/post")
 const cron = require("node-cron");
 const { archiveDebate, tokenSettlement } = require("./transactions");
 const {winFactor} = require("../config/rewardConfig");
+const timezone = { timezone: "Asia/Tokyo" };
 
 module.exports = {
   scheduleArchive: async () => {
@@ -69,7 +70,7 @@ module.exports = {
         const newDebateResult = await Debate.create(newDebate)
         console.log(newDebateResult);
       //토론으로 접근 허용
-    });
+    },timezone);
   },
   
   tokenSettlement: async () => {
@@ -109,6 +110,6 @@ module.exports = {
           await user.save();
         }
 
-    });
+    },timezone);
   },
 };

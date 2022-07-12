@@ -16,7 +16,6 @@ const erc1155ABI = require("../truffle/build/contracts/AgoraTokens.json").abi;
 let nonce = 0;
 
 const caver = new Caver(PROVIDER);
-new caver.wallet.keyring.singleKeyring(SERVER_ADDRESS, SERVER_PRIVATE_KEY);
 const mutex = new Mutex();
 
 function findMethod(ABI, methodName) {
@@ -43,13 +42,15 @@ async function sendTx(ABI, contractAddress, methodName, parameters) {
   const options = {
     from: SERVER_ADDRESS,
     to: contractAddress,
+    gas: "100000",
     nonce: nonce,
     input: ABIencoded,
   };
-  const Tx = caver.transaction.smartContractExecution.create(options);
-  const signedTx = Tx.sign(SERVER_PRIVATE_KEY);
-  //만약 send가 안되면 signedTx를 transaction.getRLPEncoding이용해 RLPEncode하도록
-  const receipt = await caver.rpc.klay.sendRawTransaction(signedTx);
+
+  const Tx = await caver.transaction.smartContractExecution.create(options);
+  const signedTx = await Tx.sign(SERVER_PRIVATE_KEY);
+  const rawSignedTx = signedTx.getRawTransaction();
+  const receipt = await caver.rpc.klay.sendRawTransaction(rawSignedTx);
 
   nonce = caver.utils.hexToNumber(nonce);
   nonce++;
@@ -94,8 +95,6 @@ module.exports = {
         "buyNFT",
         buyInfo
       );
-
-      return result;
     });
   },
   archiveDebate: async () => {
@@ -110,8 +109,6 @@ module.exports = {
         "archiving",
         parameters
       );
-
-      return result;
 
       //우승자에게 토큰 지급도 한다.. -> scheduler에서 DB에만 기록해뒀다가 나중에 TokenSettlement로 정산하도록
     });

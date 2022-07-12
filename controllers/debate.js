@@ -73,11 +73,11 @@ module.exports = {
     }
 
     todayVoteCount++;
-    userInfo.todayVoteCount = todayVoteCount;
+    userInfo.today_vote_count = todayVoteCount;
     //유저의 오늘 투표횟수 증가
 
     let reducedToken = expectedToken - votePrice;
-    userInfo.expectedToken = reducedToken;
+    userInfo.expected_token = reducedToken;
     await userInfo.save();
     //소모한 토큰 반영, 음수로 갈 수 있음
 
@@ -90,12 +90,12 @@ module.exports = {
   },
   currentDebate: async (req, res) => {
     const recentPost = await Debate.findOne({
-      order: [["createdAt", "DESC"]],
+      order: [["created_at", "DESC"]],
     });
     //어떻게 코멘트를 같이 가져오지?
     const postId = recentPost.id;
     //foreignKey를 이렇게 쓰는건지 모르겠음
-    const comments = await Comment.findAll({ where: { debateId: postId } });
+    const comments = await Comment.findAll({ where: { debate_id: postId } });
 
     const result = { post: recentPost, comments: comments };
 

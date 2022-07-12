@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   Debate.init(
     {
       title: {
-        type: DataTypes.STRING(30),
+        type: DataTypes.STRING(500),
         // 자주사용되는 자료형 STRING, TEXT, BOOLEAN, INTEGER, FLOAT, DATETIME
         allowNull: false, //필수값
       },

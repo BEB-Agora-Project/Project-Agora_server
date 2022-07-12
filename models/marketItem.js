@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER(30),
         allowNull: true,
       },
-      token_URI: {
+      token_uri: {
         type: DataTypes.STRING(500),
         allowNull: false, //필수값
       },

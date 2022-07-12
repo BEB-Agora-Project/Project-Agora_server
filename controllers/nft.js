@@ -1,14 +1,13 @@
 require("dotenv").config();
-const Market = require("../models/market");
+const MarketItem = require("../models/marketItem");
 const User = require("../models/user");
 const getUserId = require("../utils/getUserId");
 const balanceCheck = require("../utils/balanceCheck");
 const { nftBuy } = require("../utils/transactions");
-const token = require("./token");
 
 module.exports = {
   nftList: async (req, res) => {
-    const marketItems = await Market.findAll();
+    const marketItems = await MarketItem.findAll();
 
     return res.send(marketItems);
   },
@@ -17,7 +16,7 @@ module.exports = {
     const userId = await getUserId(req);
 
     const userInfo = await User.findByPk(userId);
-    const nftInfo = await Market.findOne({ where: { tokenId: tokenId } });
+    const nftInfo = await MarketItem.findOne({ where: { token_id: tokenId } });
 
     const nftPrice = nftInfo.price;
     const userAddress = userInfo.address;
