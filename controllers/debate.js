@@ -10,7 +10,7 @@ module.exports = {
     const allPost = await Debate.findAll();
     //allPost의 정렬순이 최신순인지 오래된순인지 확인하고 pop()
     //걍 프론트에서 제일 최신 포스트 제외하고 보여주면됨
-    return res.send(allPost);
+    return res.status(200).send(allPost);
   },
   currentDebate: async (req, res) => {
     const recentPost = await Debate.findOne({
@@ -40,7 +40,7 @@ module.exports = {
       disagreePost: disagreePost,
     };
 
-    return res.send(result);
+    return res.status(200).send(result);
   },
   newDebatePush: (req, res) => {
     const { title, content } = req.body;

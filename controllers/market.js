@@ -21,13 +21,17 @@ module.exports = {
       group: ["token_uri"],
     });
     //중복되는 일반 아이템들의 종류 구분할때는  먼저 tokenId 0으로 찾고나서 tokenURI "1", "2" 로 종류 구분해서 찾아오기
-    const result = { nftItems: nftItems, marketItems: marketItems };
-    return res.send(result);
+    const result = { nftItems: nftItems, normalItems: normalItems };
+    return res.status(200).send(result);
   },
   itemBuy: async (req, res) => {
     const itemId = req.params.id;
     const userId = await getUserId(req);
-    if (!userId) return res.send("Please Log in");
+    if (!userId)
+      throw new CustomError(
+        "로그인하지 않은 사용자입니다",
+        StatusCodes.UNAUTHORIZED
+      );
     //tokenId는 아이템아이디 쿼리해서 얻기
     //토큰아이디 0이면 트랜잭션은 보내지 않는걸로 수정
 
@@ -45,7 +49,8 @@ module.exports = {
     expectedToken -= itemPrice;
     currentToken -= itemPrice;
 
-    if (itemPrice > userBalance) return res.send("Not enough balance");
+    if (itemPrice > userBalance)
+      throw new CustomError("잔액이 부족합니다", StatusCodes.UNAUTHORIZED);
 
     if (tokenId === 0) {
       //nft가 아닌 일반  item
@@ -56,7 +61,7 @@ module.exports = {
       });
       await userInfo.update({ expected_token: expectedToken });
     }
-    res.send("Transaction Requested");
+    res.status(102).send("Transaction Requested");
     if (tokenId > 0) {
       //item이 nft라는 뜻
       await itemInfo.update({ sold: true, user_id: userId });

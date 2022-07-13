@@ -11,7 +11,11 @@ module.exports = {
   debatePostWrite: async (req, res) => {
     const { opinion, title, content } = req.body;
     const userId = await getUserId(req);
-    if (!userId) return res.send("Please log in");
+    if (!userId)
+      throw new CustomError(
+        "로그인하지 않은 사용자입니다",
+        StatusCodes.UNAUTHORIZED
+      );
 
     const recentDebate = await Debate.findOne({
       order: [["created_at", "DESC"]],
@@ -36,13 +40,17 @@ module.exports = {
       expected_token: curToken,
     });
 
-    return res.send(result);
+    return res.status(201).send(result);
   },
   debatePostVote: async (req, res) => {
     const vote = req.query.vote;
     const postId = req.params.id;
     const userId = await getUserId(req);
-    if (!userId) return res.send("Please log in");
+    if (!userId)
+      throw new CustomError(
+        "로그인하지 않은 사용자입니다",
+        StatusCodes.UNAUTHORIZED
+      );
 
     const postInfo = await Post.findByPk(postId);
     const userInfo = await User.findByPk(userId);
@@ -52,7 +60,8 @@ module.exports = {
 
     const curBalance = await balanceCheck(userId);
     const votePrice = VotePrice ** todayVoteCount;
-    if (curBalance < votePrice) return res.send("Not enough balance");
+    if (curBalance < votePrice)
+      throw new CustomError("잔액이 부족합니다", StatusCodes.UNAUTHORIZED);
 
     let curVote;
     if (vote === "up") {
@@ -75,20 +84,34 @@ module.exports = {
       today_vote_count: todayVoteCount,
     });
 
-    return res.send("OK");
+    return res.status(200).send(curVote);
   },
   debatePostEdit: async (req, res) => {
     //response에 수정된 updatedAt 첨부
+    const userId = await getUserId(req);
+    if (!userId)
+      throw new CustomError(
+        "로그인하지 않은 사용자입니다",
+        StatusCodes.UNAUTHORIZED
+      );
+
     const postId = req.params.id;
+
     const { opinion, title, content } = req.body;
     const postInfo = await Post.findByPk(postId);
+
+    if (postInfo.user_id !== userId)
+      throw new CustomError(
+        "본인의 포스트가 아닙니다",
+        StatusCodes.UNAUTHORIZED
+      );
     const result = await postInfo.update({
       opinion: opinion,
       title: title,
       content: content,
     });
 
-    return result;
+    return res.status(200).send(result);
   },
   debatePostList: async (req, res) => {
     const opinion = req.query.opinion;
@@ -96,6 +119,6 @@ module.exports = {
       where: { opinion: opinion },
       order: [["id", "DESC"]],
     });
-    return res.send(result);
+    return res.status(200).send(result);
   },
 };
