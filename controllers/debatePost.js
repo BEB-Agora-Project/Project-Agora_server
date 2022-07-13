@@ -11,11 +11,12 @@ module.exports = {
   debatePostWrite: async (req, res) => {
     const { opinion, title, content } = req.body;
     const userId = await getUserId(req);
-    if (!userId)
+    if (!userId) {
       throw new CustomError(
         "로그인하지 않은 사용자입니다",
         StatusCodes.UNAUTHORIZED
       );
+    }
 
     const recentDebate = await Debate.findOne({
       order: [["created_at", "DESC"]],
@@ -53,6 +54,9 @@ module.exports = {
       );
 
     const postInfo = await Post.findByPk(postId);
+    if (postInfo === null) {
+      throw CustomError("존재하지 않는 포스트입니다.", StatusCodes.NOT_FOUND);
+    }
     const userInfo = await User.findByPk(userId);
 
     let todayVoteCount = userInfo.today_vote_count;
@@ -69,11 +73,16 @@ module.exports = {
       curVote++;
       await postInfo.update({ up: curVote });
       //upVote 반영
-    } else {
+    } else if (vote === "down") {
       curVote = postInfo.down;
       curVote--;
       await postInfo.update({ down: curVote });
       //downVote 반영
+    } else {
+      throw new CustomError(
+        "올바르지 않은 요청입니다",
+        StatusCodes.NOT_ACCEPTABLE
+      );
     }
 
     todayVoteCount++;
@@ -99,6 +108,12 @@ module.exports = {
 
     const { opinion, title, content } = req.body;
     const postInfo = await Post.findByPk(postId);
+    if (postInfo === null) {
+      throw new CustomError(
+        "존재하지 않는 포스트입니다.",
+        statuscodes.NOT_FOUND
+      );
+    }
 
     if (postInfo.user_id !== userId)
       throw new CustomError(
@@ -119,6 +134,12 @@ module.exports = {
       where: { opinion: opinion },
       order: [["id", "DESC"]],
     });
+    if (result === null) {
+      throw new CustomError(
+        "아직 포스트가 존재하지 않습니다.",
+        StatusCodes.NOT_FOUND
+      );
+    }
     return res.status(200).send(result);
   },
 };

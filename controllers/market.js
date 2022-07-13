@@ -37,6 +37,12 @@ module.exports = {
 
     const userInfo = await User.findByPk(userId);
     const itemInfo = await MarketItem.findByPk(itemId);
+    if (itemInfo === null) {
+      throw new CustomError(
+        "존재하지 않는 아이템입니다.",
+        StatusCodes.NOT_FOUND
+      );
+    }
 
     const tokenId = itemInfo.token_id;
 
