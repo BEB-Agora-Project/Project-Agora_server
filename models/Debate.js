@@ -1,8 +1,7 @@
 'use strict';
 const { Model } = require('sequelize');
-// const { board } = require('./board');
 module.exports = (sequelize, DataTypes) => {
-    class comment extends Model {
+    class Debate extends Model {
         /**
          * Helper method for defining associations.
          * This method is not a part of Sequelize lifecycle.
@@ -12,35 +11,34 @@ module.exports = (sequelize, DataTypes) => {
             // define association here
         }
     }
-    comment.init(
+    Debate.init(
         {
-            content: {
+            title: {
                 type:DataTypes.STRING(500),
                 allowNull: false, //필수값
             },
+            content: {
+                type:DataTypes.STRING(500),
+                allowNull: false, //필수값
+            }
         },
         {
             sequelize,
-            modelName: 'comment',
+            modelName: 'Debate',
             charset: 'utf8',
-            collate: 'utf8_general_ci'
+            collate: 'utf8_general_ci',
+            underscored:true
         }
     );
 
-    comment.associate = function(models){
-        comment.belongsTo(models.board, {
-            foreignKey: "boardId",
-            targetKey: "id",
+    Debate.associate = function(models){
+        Debate.hasOne(models.Post, {
+            foreignKey: "debate_id",
+            sourceKey: "id",
             onDelete: 'cascade',
             onUpdate: 'cascade'
         });
-        comment.belongsTo(models.user, {
-            foreignKey: "userId",
-            targetKey: "id",
-            onDelete: 'cascade',
-            onUpdate: 'cascade'
-        })
     };
 
-    return comment;
+    return Debate;
 };

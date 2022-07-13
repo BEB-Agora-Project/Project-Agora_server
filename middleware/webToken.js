@@ -3,19 +3,17 @@ const {sign, verify} = require('jsonwebtoken');
 
 module.exports={
     generateAccessToken: async (data) => {
-        const token = await sign(data, process.env.ACCESS_SECRET, {expiresIn: '1d'})
-        return token;
+        return await sign(data, process.env.ACCESS_SECRET, {expiresIn: '1d'});
     },
-    sendAccessToken: (res, accessToken) => {
-        return res.cookie("jwt",accessToken);
-    },
+    // sendAccessToken: (res, accessToken) => {
+    //     return res.cookie("jwt",accessToken);
+    // },
     isAuthorized: async (req) => {
-        if(req.headers['cookie']){
-            const token =req.headers['cookie'].split('jwt=')[1].split(';')[0]
+        if(req.headers['authorization']){
+            const token =req.headers['authorization'].split('Bearer ')[1]
             return verify(token, process.env.ACCESS_SECRET);
         }else{
             return false
         }
     }
-
 }

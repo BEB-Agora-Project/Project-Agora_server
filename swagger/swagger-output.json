@@ -29,7 +29,7 @@
     }
   },
   "paths": {
-    "/account/signIn": {
+    "/account/signin": {
       "post": {
         "tags": [
           "account"
@@ -106,6 +106,29 @@
         ],
         "description": "로그아웃을 한다.",
         "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/account/editPassword": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "description": "비밀번호를 변경한다.",
+        "parameters": [
+          {
+            "name": "password",
+            "in": "body",
+            "description": "유저 패스워드",
+            "required": true,
+            "schema": {
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -196,10 +219,12 @@
         "description": "게시글에 대한 댓글을 작성한다.",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
+            "name": "postId",
+            "in": "body",
+            "description": "게시글 아이디",
             "required": true,
-            "type": "string"
+            "schema": {
+            }
           },
           {
             "name": "content",
@@ -257,6 +282,46 @@
             "schema": {
               "$ref": "#/definitions/writeResponse"
             }
+          }
+        }
+      }
+    },
+    "/board/delete/{id}": {
+      "post": {
+        "tags": [
+          "board"
+        ],
+        "description": "게시글을 삭제한다.",
+        "parameters": [{
+          "name": "id",
+          "in": "path",
+          "description": "삭제할 게시글 번호",
+          "required": true,
+          "type": "string"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/board/comment/delete/{id}": {
+      "post": {
+        "tags": [
+          "board"
+        ],
+        "description": "댓글을 삭제한다.",
+        "parameters": [{
+          "name": "id",
+          "in": "path",
+          "description": "삭제할 댓글 번호",
+          "required": true,
+          "type": "string"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }

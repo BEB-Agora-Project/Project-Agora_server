@@ -1,13 +1,17 @@
 const router = require('express').Router();
-const {write,getWritingById,getAllWriting,commentToWriting,edit} = require('../controllers/board');
+const {writePost,getPost,getPostsList,writeComment,editPost,editComment,deletePost,deleteComment} = require('../controllers/board');
 
 
 
-router.post('/write', write);
-router.get("/:id", getWritingById);
-router.get("/", getAllWriting);
-router.post("/comment/:id", commentToWriting);
-router.post("/edit/:id", edit);
+router.post('/posts', writePost);
+router.get("/posts/:id", getPost);
+router.get("/posts", getPostsList);
+router.post("/comments", writeComment);
+router.put("/posts/:id", editPost);
+router.put("/comments/:id", editComment);
+router.delete("/posts/:id", deletePost);
+router.delete("/comments/:id", deleteComment);
+
 
 
 
