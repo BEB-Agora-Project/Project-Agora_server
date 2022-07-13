@@ -8,6 +8,7 @@ const cron = require("node-cron");
 const { archiveDebate, tokenSettlement } = require("./transactions");
 const {winFactor} = require("../config/rewardConfig");
 const timezone = { timezone: "Asia/Tokyo" };
+const debateList = require("./debateList");
 
 module.exports = {
   scheduleArchive: async () => {
@@ -63,10 +64,19 @@ module.exports = {
 
       //새 토론 주제 설정, 걍 DB에 debateList.js에서 꺼내온담에 제일 최신으로 넣어주기.
       //newDebate는 쓰윽 가져오기
+
+      let title = "TEST 게시 예정인 토론이 없습니다. TEST"
+      let content = "TEST 게시 예정인 토론이 없습니다. TEST"
+
+      if(debateList.length !== 0){
+        //DB 뽑아와서 title, content 재할당
+      }
       const newDebate = { 
         title : title,
         content : content,
       };
+
+      
         const newDebateResult = await Debate.create(newDebate)
         console.log(newDebateResult);
       //토론으로 접근 허용

@@ -21,30 +21,14 @@ const callback = (err, event) => {
 
 module.exports = {
   tokenReward: async () => {
-    ERC1155Contract.events
-      .MintedToken(options, callback)
-      .on("connected", (subscriptionId) =>
-        console.log("connected with ID", subscriptionId)
-      );
+    ERC1155Contract.events.MintedToken(options, callback);
 
-    ERC1155Contract.events
-      .BurnedToken(options, callback)
-      .on("connected", (subscriptionId) =>
-        console.log("connected with ID", subscriptionId)
-      );
+    ERC1155Contract.events.BurnedToken(options, callback);
   },
   nftBuy: async () => {
-    ERC1155Contract.events
-      .UserNFTBuy(options, callback)
-      .on("connected", (subscriptionId) =>
-        console.log("connected with ID", subscriptionId)
-      );
+    ERC1155Contract.events.UserNFTBuy(options, callback);
   },
   archived: async () => {
-    archiveContract.events
-      .Archived(options, callback)
-      .on("connected", (subscriptionId) =>
-        console.log("connected with ID", subscriptionId)
-      );
+    archiveContract.events.Archived(options, callback);
   },
 };

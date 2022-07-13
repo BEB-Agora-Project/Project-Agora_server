@@ -2,14 +2,7 @@
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Board extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
+    static associate(models) {}
   }
   Board.init(
     {
@@ -27,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Board.associate = function (models) {
-    Board.hasOne(models.Post, {
+    Board.hasMany(models.Post, {
       foreignKey: "board_id",
       sourceKey: "id",
       onDelete: "cascade",

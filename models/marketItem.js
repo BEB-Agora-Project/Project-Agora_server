@@ -2,14 +2,7 @@
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class MarketItem extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
+    static associate(models) {}
   }
   MarketItem.init(
     {
@@ -19,11 +12,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       token_uri: {
         type: DataTypes.STRING(500),
-        allowNull: false, //필수값
+        allowNull: false,
       },
       price: {
         type: DataTypes.INTEGER(30),
-        allowNull: true, //필수값,
+        allowNull: false,
         defaultValue: 0,
       },
       sold: {

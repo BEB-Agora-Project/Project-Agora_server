@@ -2,28 +2,21 @@
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
+    static associate(models) {}
   }
   User.init(
     {
       username: {
         type: DataTypes.STRING(30),
-        allowNull: false, //필수값
+        allowNull: false,
       },
       password: {
         type: DataTypes.STRING(100),
-        allowNull: false, //필수값
+        allowNull: false,
       },
       email: {
         type: DataTypes.STRING(30),
-        allowNull: false, //필수값
+        allowNull: false,
       },
       address: {
         type: DataTypes.STRING(100),
@@ -34,12 +27,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       current_token: {
-        type: DataTypes.INTEGER(100),
+        type: DataTypes.INTEGER(100000),
         allowNull: false,
         defaultValue: 0,
       },
       expected_token: {
-        type: DataTypes.INTEGER(100),
+        type: DataTypes.INTEGER(100000),
         allowNull: false,
         defaultValue: 0,
       },
