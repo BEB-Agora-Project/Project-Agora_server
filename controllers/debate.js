@@ -48,4 +48,17 @@ module.exports = {
     debateList.push(obj);
     return res.json(debateList);
   },
+  test: (req, res) => {
+    const { title, content } = req.body;
+    const obj = { title: title, content: content };
+    debateList.push(obj);
+    let newDebate =
+      debateList.length !== 0
+        ? debateList.shift()
+        : {
+            title: "TEST 게시 예정인 토론이 없습니다. TEST",
+            content: "TEST 게시 예정인 토론이 없습니다. TEST",
+          };
+    return res.json(newDebate);
+  },
 };

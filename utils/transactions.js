@@ -60,28 +60,32 @@ async function sendTx(ABI, contractAddress, methodName, parameters) {
 module.exports = {
   tokenSettlement: async (mintList, burnList) => {
     //토큰 보상을 받아야하는사람들 처리
-    await mutex.runExclusive(async () => {
-      //runExclusive always release locks
-      //Below code prevents nonce hell
+    if (mintList[0].length !== 0) {
+      await mutex.runExclusive(async () => {
+        //runExclusive always release locks
+        //Below code prevents nonce hell
 
-      //parameters엔 업데이트 명단 들어감
-      const result = await sendTx(
-        erc1155ABI,
-        ERC1155_ADDRESS,
-        "tokenMint",
-        mintList
-      );
-    });
+        //parameters엔 업데이트 명단 들어감
+        const result = await sendTx(
+          erc1155ABI,
+          ERC1155_ADDRESS,
+          "tokenMint",
+          mintList
+        );
+      });
+    }
 
     //토큰을 많이써서 토큰을 태워야 하는사람들 처리
-    await mutex.runExclusive(async () => {
-      const result = await sendTx(
-        erc1155ABI,
-        ERC1155_ADDRESS,
-        "tokenBurn",
-        burnList
-      );
-    });
+    if (burnList[0].length !== 0) {
+      await mutex.runExclusive(async () => {
+        const result = await sendTx(
+          erc1155ABI,
+          ERC1155_ADDRESS,
+          "tokenBurn",
+          burnList
+        );
+      });
+    }
 
     //update DB expectedToken + currentToken => currentToken, expectedToken = 0
     //DB업데이트는 스케쥴러로 빼자, 여기서는 클레이튼 트랜잭션만 담당.

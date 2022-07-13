@@ -1,4 +1,6 @@
 const express = require("express");
+const cron = require("node-cron");
+const timezone = { timezone: "Asia/Tokyo" };
 const models = require("./models/index.js");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -8,17 +10,26 @@ const boardRoutes = require("./routes/board");
 const debateRoutes = require("./routes/debate");
 const marketRoutes = require("./routes/market");
 //테스트용 모듈입니다
-const { Test } = require("./Test");
+const { scheduleArchive, scheduleSettlement } = require("./utils/scheduler");
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger/swagger-output.json");
 const https = require("https");
 const fs = require("fs");
 const app = express();
+
 const PORT = process.env.HTTPS_PORT;
 
-//스케쥴러 임포트해서 실행
-//서브스크라이버 임포트해서 실행
+// 데이터베이스 연결
+models.sequelize
+  .sync()
+  .then(() => {
+    console.log(" DB 연결 성공");
+  })
+  .catch((err) => {
+    console.log("연결 실패");
+    console.log(err);
+  });
 
 // api 통신을 위한 모듈 설정
 app.use(cookieParser());
@@ -40,29 +51,26 @@ app.use("/debate", debateRoutes);
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 //테스트용 경로입니다
-app.post("/test", Test);
+// app.post("/test", Test);
 
-// 데이터베이스 연결 및 HTTPS 서버 실행
-models.sequelize
-  .sync()
-  .then(() => {
-    console.log(" DB 연결 성공");
-    if (fs.existsSync("./key.pem") && fs.existsSync("./cert.pem")) {
-      const privateKey = fs.readFileSync(__dirname + "/key.pem", "utf8");
-      const certificate = fs.readFileSync(__dirname + "/cert.pem", "utf8");
-      const credentials = { key: privateKey, cert: certificate };
-      let server = https.createServer(credentials, app);
-      server.listen(PORT, async () => {
-        console.log(`      🚀 HTTPS Server is starting on ${PORT}`);
-      });
-    } else {
-      app.listen(PORT, async () => {
-        console.log("you don't have cert.pem, key.pem!!");
-        console.log(`      🚀 HTTP Server is starting on ${PORT}`);
-      });
-    }
-  })
-  .catch((err) => {
-    console.log("연결 실패");
-    console.log(err);
+cron.schedule("0 10 3 * * *", () => {
+  scheduleSettlement();
+});
+cron.schedule("* * * * * *", () => {
+  scheduleArchive();
+});
+
+if (fs.existsSync("./key.pem") && fs.existsSync("./cert.pem")) {
+  const privateKey = fs.readFileSync(__dirname + "/key.pem", "utf8");
+  const certificate = fs.readFileSync(__dirname + "/cert.pem", "utf8");
+  const credentials = { key: privateKey, cert: certificate };
+  let server = https.createServer(credentials, app);
+  server.listen(PORT, async () => {
+    console.log(`      🚀 HTTPS Server is starting on ${PORT}`);
   });
+} else {
+  app.listen(PORT, async () => {
+    console.log("you don't have cert.pem, key.pem!!");
+    console.log(`      🚀 HTTP Server is starting on ${PORT}`);
+  });
+}

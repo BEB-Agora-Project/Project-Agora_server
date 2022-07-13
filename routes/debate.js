@@ -16,6 +16,7 @@ const {
   archiveList,
   currentDebate,
   newDebatePush,
+  test,
 } = require("../controllers/debate");
 
 //comment
@@ -34,5 +35,6 @@ router.get("/post", debatePostList); //?opinion 에 따라 해당 포스트 리�
 router.get("/archive", archiveList);
 router.get("/", currentDebate);
 router.post("/newDebate", newDebatePush); //새 예정 토론 등록, 개발용입니다
+router.post("/test", test);
 
 module.exports = router;
