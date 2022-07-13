@@ -11,6 +11,7 @@ const https = require("https");
 const fs = require("fs");
 const app = express();
 const PORT = process.env.HTTPS_PORT;
+const errorHandler = require('./errors/error-handler')
 
 // api 통신을 위한 모듈 설정
 app.use(cookieParser());
@@ -28,6 +29,10 @@ app.use(
 app.use('/account', accountRoutes);
 app.use('/board', boardRoutes);
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+
+//무조건 에러설정은 라우팅 설정 밑에넣는다
+app.use(errorHandler)
 
 // 데이터베이스 연결 및 HTTPS 서버 실행
 models.sequelize.sync().then( () => {
