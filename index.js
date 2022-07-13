@@ -56,7 +56,7 @@ app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 cron.schedule("0 10 3 * * *", () => {
   scheduleSettlement();
 });
-cron.schedule("* * * * * *", () => {
+cron.schedule("0 0 3 * * *", () => {
   scheduleArchive();
 });
 
