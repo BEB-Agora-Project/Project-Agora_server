@@ -24,12 +24,12 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
       },
       up: {
-        type: DataTypes.INTEGER(1000),
+        type: DataTypes.INTEGER(255),
         allowNull: false,
         defaultValue: 0,
       },
       down: {
-        type: DataTypes.INTEGER(1000),
+        type: DataTypes.INTEGER(255),
         allowNull: false,
         defaultValue: 0,
       },
@@ -39,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Post",
       charset: "utf8",
       collate: "utf8_general_ci",
+      underscored: true,
     }
   );
 

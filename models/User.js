@@ -27,12 +27,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       current_token: {
-        type: DataTypes.INTEGER(100000),
+        type: DataTypes.INTEGER(255),
         allowNull: false,
         defaultValue: 0,
       },
       expected_token: {
-        type: DataTypes.INTEGER(100000),
+        type: DataTypes.INTEGER(255),
         allowNull: false,
         defaultValue: 0,
       },
@@ -46,12 +46,18 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: false,
       },
+      is_auth: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       sequelize,
       modelName: "User",
       charset: "utf8",
       collate: "utf8_general_ci",
+      underscored: true,
     }
   );
   User.associate = function (models) {

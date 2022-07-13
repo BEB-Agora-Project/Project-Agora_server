@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "MarketItem",
       charset: "utf8",
       collate: "utf8_general_ci",
+      underscored: true,
     }
   );
 

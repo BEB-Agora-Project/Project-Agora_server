@@ -2,13 +2,12 @@
 const { Op } = require("sequelize");
 const User = require("../models/user");
 const Debate = require("../models/debate");
-const Post = require("../models/comment");
 const Post = require("../models/post")
 const cron = require("node-cron");
 const { archiveDebate, tokenSettlement } = require("./transactions");
 const {winFactor} = require("../config/rewardConfig");
 const timezone = { timezone: "Asia/Tokyo" };
-const debateList = require("./debateList");
+const {debateList} = require("./debateList");
 
 module.exports = {
   scheduleArchive: async () => {
@@ -36,7 +35,7 @@ module.exports = {
   
       //스마트컨트랙트 스트링받도록 수정
       const archiveResult = await archiveDebate(archivePost); 
-      console.log("succesfully archived", result);
+      console.log("succesfully archived", archiveResult);
 
       //코멘트 우승자에게 토큰보상 DB로 기록해주기
 
@@ -49,17 +48,23 @@ module.exports = {
       const neutralUserId = winNeutralPost.user_id;
       const disagreeUserId = winDisagreePost.user_id;
 
-      let agreeUser = await User.findByPk(agreeUserId);
-      let neutralUser = await User.findByPk(neutralUserId);
-      let disagreeUser = await User.findByPk(disagreeUserId);
+      const agreeUserInfo = await User.findByPk(agreeUserId);
+      const neutralUserInfo = await User.findByPk(neutralUserId);
+      const disagreeUserInfo = await User.findByPk(disagreeUserId);
 
-      agreeUser.expected_token += agreeReward;
-      neutralUser.expected_token += neutralReward;
-      disagreeUser.expected_token += disagreeReward;
 
-      await agreeUser.save();
-      await neutralUser.save();
-      await disagreeUser.save();
+
+      agreeExpectedToken = agreeUserInfo.expected_token;
+      neutralExpectedToken = neutralUserInfo.expected_token;
+      disagreeExpectedToken = disagreeUserInfo.expected_token;
+
+      agreeExpectedToken += agreeReward;
+      neutralExpectedToken += neutralReward;
+      disagreeExpectedToken += disagreeReward;
+
+      await agreeUserInfo.update({expected_token : agreeExpectedToken});
+      await neutralUserInfo.update({expected_token : neutralExpectedToken});
+      await disagreeUserInfo.update({expected_token : disagreeExpectedToken});
       //DB Reward Done
 
       //새 토론 주제 설정, 걍 DB에 debateList.js에서 꺼내온담에 제일 최신으로 넣어주기.
@@ -88,6 +93,7 @@ module.exports = {
       //토큰 정산 시작
       //DB에서 정산 리스트 만들기
       //정산후 DB업데이트
+      //정산동안 사이트 내리기.
 
       //어차피 나중에 업데이트할거니까 싹다 가져옴
       const attributes = ["address", "expected_token"];
@@ -112,12 +118,17 @@ module.exports = {
       
         //update DB expectedToken + currentToken => currentToken, expectedToken = 0, 모든 유저에 대해
         let allUser = await User.findAll();
+        let user;
+        let settledToken
+        let userId;
+        let userInfo;
         for(let i = 0 ; i < allUser.length ; i++ ) {
-          let user = allUser[i];
-          let settledToken = user.current_token + user.expected_token;
-          user.current_token = settledToken;
-          user.expected_token = 0;
-          await user.save();
+          user = allUser[i];
+          settledToken = user.current_token + user.expected_token;
+          userId = user.id;
+
+          userInfo = await User.findByPk(userId);
+          await userInfo.update({current_token : settledToken, expected_token : 0, today_vote_count : 0});
         }
 
     },timezone);

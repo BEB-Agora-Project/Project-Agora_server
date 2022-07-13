@@ -6,8 +6,9 @@ const cookieParser = require("cookie-parser");
 const accountRoutes = require("./routes/account");
 const boardRoutes = require("./routes/board");
 const debateRoutes = require("./routes/debate");
-const nftRoutes = require("./routes/nft");
-const tokenRoutes = require("./routes/token");
+const marketRoutes = require("./routes/market");
+//테스트용 모듈입니다
+const { Test } = require("./Test");
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger/swagger-output.json");
@@ -26,18 +27,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // cors 에러를 잡아주기 위한 설정 -> 여기서는 로컬의 3000번 포트에대한 접근을 허용함
 app.use(
   cors({
-    origin: ["https://localhost:3000"],
+    origin: true,
     credentials: true,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 // 라우터 연결
 app.use("/account", accountRoutes);
 app.use("/board", boardRoutes);
-app.use("/nft", nftRoutes);
-app.use("/token", tokenRoutes);
+app.use("/nft", marketRoutes);
 app.use("/debate", debateRoutes);
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+//테스트용 경로입니다
+app.post("/test", Test);
 
 // 데이터베이스 연결 및 HTTPS 서버 실행
 models.sequelize

@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Debate",
       charset: "utf8",
       collate: "utf8_general_ci",
+      underscored: true,
     }
   );
 
