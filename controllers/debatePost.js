@@ -130,4 +130,18 @@ module.exports = {
     });
     return res.status(200).send(result);
   },
+  getPopularDebatePosts: async (req, res) => {
+    const { opinion } = req.query;
+    const debateId = req.params.debate_id;
+    const result = await Post.findAll({
+      where: { opinion: opinion, debate_id: debateId },
+      order: [
+        ["id", "DESC"],
+        ["up", "DESC"],
+      ],
+      include: [{ model: User, attributes: ["username"] }],
+    });
+
+    return res.status(200).send(result);
+  },
 };

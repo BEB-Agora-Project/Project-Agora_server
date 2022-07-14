@@ -225,4 +225,17 @@ module.exports = {
       return res.send(405).send("그런 요청은 없다");
     }
   }),
+  getPopularBoardPosts: async (req, res) => {
+    const boardId = req.params.board_id;
+    const result = await Post.findAll({
+      where: { board_id: boardId },
+      order: [
+        ["id", "DESC"],
+        ["up", "DESC"],
+      ],
+      include: [{ model: User, attributes: ["username"] }],
+    });
+
+    return res.status(200).send(result);
+  },
 };
