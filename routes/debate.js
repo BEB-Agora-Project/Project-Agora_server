@@ -17,24 +17,25 @@ const {
   currentDebate,
   newDebatePush,
   test,
+  newDebateDB,
 } = require("../controllers/debate");
 
 //comment
-router.post("/post/:id", debateCommentWrite);
-router.post("/comment/:id", debateCommentVote); //up,down vote 인지 확인 ?vote=up
-router.put("/comment/:id", debateCommentEdit);
-router.get("/post/:id", debatePostComments); // post의 커멘트 get
+router.post("/post/:post_id/comment", debateCommentWrite);
+router.post("/post/:post_id/comment/:comment_id", debateCommentVote); //up,down vote 인지 확인 ?vote=up
+router.put("/post/:post_id/comment/:comment_id", debateCommentEdit);
+router.get("/post/:post_id/comment", debatePostComments); // post의 커멘트 get
 
 //post
-router.post("/post", debatePostWrite); // ?opinion=1  query 로 가져오기
-router.post("/post/:id", debatePostVote); //up,down vote 인지 확인 ?vote=up
-router.put("/post/:id", debatePostEdit);
+router.post("/post", debatePostWrite);
+router.post("/post/:post_id", debatePostVote); //up,down vote 인지 확인 ?vote=up
+router.put("/post/:post_id", debatePostEdit);
 router.get("/post", debatePostList); //?opinion 에 따라 해당 포스트 리턴
 
 //debate
 router.get("/archive", archiveList);
 router.get("/", currentDebate);
 router.post("/newDebate", newDebatePush); //새 예정 토론 등록, 개발용입니다
-router.post("/test", test);
+router.post("/newDebateDB", newDebateDB);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 require("dotenv").config();
 const getUserId = require("../utils/getUserId");
-const User = require("../models/user");
+const { User } = require("../models");
 
 module.exports = {
   myToken: async (req, res) => {

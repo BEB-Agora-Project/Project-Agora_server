@@ -1,31 +1,17 @@
 require("dotenv").config();
 
-const Comment = require("../models/Comment");
-const CustomError = require("../errors/custom-error");
-const StatusCodes = require("http-status-codes");
-
-const getUserId = require("../utils/getUserId");
-const Post = require("../models/Post");
+const { Comment, Post } = require("../models");
+const { getUserId } = require("../utils/getUserId");
 
 module.exports = {
   debateCommentWrite: async (req, res) => {
     const { content } = req.body;
-    const postId = req.params.id;
+    const postId = req.params.post_id;
 
     const post = await Post.findByPk(postId);
-    if (post === null) {
-      throw new CustomError(
-        "포스트가 존재하지 않습니다",
-        StatusCodes.NOT_FOUND
-      );
-    }
+    if (post === null) return res.send(404).send("존재하지 않는 포스트입니다");
     const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError(
-        "로그인하지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
-    }
+    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
 
     const result = await Comment.create({
       content: content,
@@ -37,22 +23,20 @@ module.exports = {
   },
   debateCommentVote: async (req, res) => {
     const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError(
-        "로그인하지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
-    }
-    const commentId = req.params.id;
+    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
+
+    const postId = req.params.post_id;
+    const commentId = req.params.comment_id;
     const vote = req.query.vote;
     let curVote;
 
+    const postInfo = await Post.findByPk(postId);
+    if (postInfo === null) {
+      return res.status(404).send("존재하지 않는 포스트입니다");
+    }
     const commentInfo = await Comment.findByPk(commentId);
     if (commentInfo === null) {
-      throw new CustomError(
-        "코멘트가 존재하지 않습니다",
-        StatusCodes.NOT_FOUND
-      );
+      return res.status(404).send("존재하지 않는 코멘트입니다");
     }
     if (vote === "up") {
       curVote = commentInfo.up;
@@ -60,47 +44,40 @@ module.exports = {
       await commentInfo.update({
         up: curVote,
       });
-      return res.status(200).send(curVote);
+      return res.status(200).send({ curVote: curVote });
     } else if (vote === "down") {
       curVote = commentInfo.down;
       curVote--;
       await commentInfo.update({
         down: curVote,
       });
-      return res.status(200).send(curVote);
+      return res.status(200).send({ curVote: curVote });
     } else {
-      throw new CustomError(
-        "올바르지 않은 요청입니다",
-        StatusCodes.NOT_ACCEPTABLE
-      );
+      return res.status(400).send("올바르지 않은 요청입니다.");
     }
   },
   debateCommentEdit: async (req, res) => {
     const userId = await getUserId(req);
     const { content } = req.body;
-    const commentId = req.params.id;
-    if (!userId) {
-      throw new CustomError(
-        "로그인하지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
+    const commentId = req.params.comment_id;
+    const postId = req.params.post_id;
+
+    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
+
+    const postInfo = await Post.findByPk(postId);
+    if (postInfo === null) {
+      return res.status(404).send("존재하지 않는 포스트입니다");
     }
 
     const commentInfo = await Comment.findByPk(commentId);
-
     if (commentInfo === null) {
-      throw new CustomError(
-        "존재하지 않는 코멘트입니다",
-        StatusCodes.NOT_FOUND
-      );
+      return res.status(404).send("존재하지 않는 코멘트입니다");
     }
     const commentUser = commentInfo.user_id;
     if (commentUser !== userId) {
-      throw new CustomError(
-        "본인의 코멘트가 아닙니다",
-        StatusCodes.UNAUTHORIZED
-      );
+      return res.status(401).send("본인 코멘트가 아닙니다");
     }
+
     const result = await commentInfo.update({
       content: content,
     });
@@ -108,13 +85,10 @@ module.exports = {
     return res.status(200).send(result);
   },
   debatePostComments: async (req, res) => {
-    const postId = req.params.id;
+    const postId = req.params.post_id;
     const result = await Comment.findAll({ where: { post_id: postId } });
     if (result === null) {
-      throw new CustomError(
-        "코멘트가 아직 존재하지 않습니다.",
-        StatusCodes.NOT_FOUND
-      );
+      return res.status(204).send("아직 코멘트가 없습니다");
     }
     return res.status(200).send(result);
   },

@@ -25,7 +25,6 @@ contract Debate is Ownable {
 
 
     function archiving (uint256 id, string calldata title, string calldata agreeComment, string calldata neturalComment, string calldata disagreeComment) external onlyOwner returns(bool) {
-        require(postWithId[id].id < 0 , "post with corresponding id is already exist");
         DebatePost memory archived = DebatePost(id, title, agreeComment, neturalComment, disagreeComment);
         postWithId[id] = archived;
         archive.push(archived);

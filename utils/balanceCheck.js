@@ -1,4 +1,4 @@
-const User = require("../models/user");
+const { User } = require("../models");
 
 // 요청을 처리하기전에 currentToken + expectedToekn이 요청에 필요한 토큰양보다 많은지 확인하는 함수
 

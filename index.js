@@ -53,6 +53,7 @@ app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 //테스트용 경로입니다
 // app.post("/test", Test);
 
+//스케줄러
 cron.schedule("0 10 3 * * *", () => {
   scheduleSettlement();
 });

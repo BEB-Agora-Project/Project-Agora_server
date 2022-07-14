@@ -20,7 +20,7 @@ const mutex = new Mutex();
 
 function findMethod(ABI, methodName) {
   for (let i = 0; i < ABI.length; i++) {
-    if (ABI[i].name === methodName) return [ABI[i]];
+    if (ABI[i].name === methodName) return ABI[i];
   }
 }
 
@@ -37,12 +37,16 @@ async function sendTx(ABI, contractAddress, methodName, parameters) {
 
   nonce = caver.utils.numberToHex(nonce);
 
+  console.log(parameters);
+
   const methodABI = findMethod(ABI, methodName); //ABI에서 원하는 method를 골라야됨
   const ABIencoded = caver.abi.encodeFunctionCall(methodABI, parameters);
+  console.log(ABIencoded);
+
   const options = {
     from: SERVER_ADDRESS,
     to: contractAddress,
-    gas: "100000",
+    gas: "10000000",
     nonce: nonce,
     input: ABIencoded,
   };
@@ -59,9 +63,11 @@ async function sendTx(ABI, contractAddress, methodName, parameters) {
 
 module.exports = {
   tokenSettlement: async (mintList, burnList) => {
+    let TxResult = [];
+
     //토큰 보상을 받아야하는사람들 처리
     if (mintList[0].length !== 0) {
-      await mutex.runExclusive(async () => {
+      const final1 = await mutex.runExclusive(async () => {
         //runExclusive always release locks
         //Below code prevents nonce hell
 
@@ -72,40 +78,49 @@ module.exports = {
           "tokenMint",
           mintList
         );
+        return result;
       });
+      TxResult.push(final1);
     }
 
     //토큰을 많이써서 토큰을 태워야 하는사람들 처리
     if (burnList[0].length !== 0) {
-      await mutex.runExclusive(async () => {
+      const final2 = await mutex.runExclusive(async () => {
         const result = await sendTx(
           erc1155ABI,
           ERC1155_ADDRESS,
           "tokenBurn",
           burnList
         );
+        return result;
       });
+      TxResult.push(final2);
     }
 
+    return TxResult;
     //update DB expectedToken + currentToken => currentToken, expectedToken = 0
     //DB업데이트는 스케쥴러로 빼자, 여기서는 클레이튼 트랜잭션만 담당.
   },
   nftBuy: async (buyInfo) => {
-    await mutex.runExclusive(async () => {
+    const parameters = buyInfo;
+    const final = await mutex.runExclusive(async () => {
       //buyInfo엔 구매자, 토큰아이디, 가격 들어감
       const result = await sendTx(
         erc1155ABI,
         ERC1155_ADDRESS,
         "buyNFT",
-        buyInfo
+        parameters
       );
+      return result;
     });
+
+    return final;
   },
-  archiveDebate: async () => {
-    await mutex.runExclusive(async (archivePost) => {
+  archiveDebate: async (archivePost) => {
+    const parameters = archivePost;
+    const final = await mutex.runExclusive(async () => {
       //runExclusive always release lock
       //parameters는 DB에서 가장 최신 debate post 가져와서 해쉬화 해주도록 한다!
-      const parameters = archivePost;
 
       const result = await sendTx(
         debateABI,
@@ -113,8 +128,11 @@ module.exports = {
         "archiving",
         parameters
       );
+      return result;
 
       //우승자에게 토큰 지급도 한다.. -> scheduler에서 DB에만 기록해뒀다가 나중에 TokenSettlement로 정산하도록
     });
+
+    return final;
   },
 };

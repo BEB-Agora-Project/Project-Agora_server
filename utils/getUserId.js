@@ -1,4 +1,5 @@
-const User = require("../models/user");
+const { User } = require("../models");
+const { isAuthorized } = require("../middleware/webToken");
 
 async function getUserId(req) {
   const decoded = await isAuthorized(req);

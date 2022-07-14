@@ -1,25 +1,20 @@
-const Post = require("../models/Post");
-const Debate = require("../models/Debate");
-const User = require("../models/User");
+const { Post, Debate, User } = require("../models");
+const { balanceCheck } = require("../utils/balanceCheck");
+const { asyncWrapper } = require("../errors/async");
 
-const balanceCheck = require("../utils/balanceCheck");
-const CustomError = require("../errors/custom-error");
-const StatusCodes = require("http-status-codes");
+const { getUserId } = require("../utils/getUserId");
 
 const { debatePostReward, VotePrice } = require("../config/rewardConfig");
 module.exports = {
-  debatePostWrite: async (req, res) => {
+  debatePostWrite: asyncWrapper(async (req, res) => {
     const { opinion, title, content } = req.body;
     const userId = await getUserId(req);
     if (!userId) {
-      throw new CustomError(
-        "로그인하지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
+      return res.status(401).send("로그인하지 않은 사용자입니다");
     }
 
     const recentDebate = await Debate.findOne({
-      order: [["created_at", "DESC"]],
+      order: [["id", "DESC"]],
     });
     const debateId = recentDebate.id;
 
@@ -42,20 +37,16 @@ module.exports = {
     });
 
     return res.status(201).send(result);
-  },
+  }),
   debatePostVote: async (req, res) => {
     const vote = req.query.vote;
-    const postId = req.params.id;
+    const postId = req.params.post_id;
     const userId = await getUserId(req);
-    if (!userId)
-      throw new CustomError(
-        "로그인하지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
+    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
 
     const postInfo = await Post.findByPk(postId);
     if (postInfo === null) {
-      throw CustomError("존재하지 않는 포스트입니다.", StatusCodes.NOT_FOUND);
+      return res.status(404).send("존재하지 않는 포스트입니다");
     }
     const userInfo = await User.findByPk(userId);
 
@@ -64,9 +55,9 @@ module.exports = {
 
     const curBalance = await balanceCheck(userId);
     const votePrice = VotePrice ** todayVoteCount;
-    if (curBalance < votePrice)
-      throw new CustomError("잔액이 부족합니다", StatusCodes.UNAUTHORIZED);
-
+    if (curBalance < votePrice) {
+      return res.status(401).send("잔액이 부족합니다");
+    }
     let curVote;
     if (vote === "up") {
       curVote = postInfo.up;
@@ -79,10 +70,7 @@ module.exports = {
       await postInfo.update({ down: curVote });
       //downVote 반영
     } else {
-      throw new CustomError(
-        "올바르지 않은 요청입니다",
-        StatusCodes.NOT_ACCEPTABLE
-      );
+      return res.status(400).send("올바르지 않은 요청입니다");
     }
 
     todayVoteCount++;
@@ -93,33 +81,24 @@ module.exports = {
       today_vote_count: todayVoteCount,
     });
 
-    return res.status(200).send(curVote);
+    return res.status(200).send({ curVote: curVote });
   },
   debatePostEdit: async (req, res) => {
     //response에 수정된 updatedAt 첨부
     const userId = await getUserId(req);
-    if (!userId)
-      throw new CustomError(
-        "로그인하지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
+    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
 
-    const postId = req.params.id;
+    const postId = req.params.post_id;
 
     const { opinion, title, content } = req.body;
     const postInfo = await Post.findByPk(postId);
     if (postInfo === null) {
-      throw new CustomError(
-        "존재하지 않는 포스트입니다.",
-        statuscodes.NOT_FOUND
-      );
+      return res.status(404).send("존재하지 않는 포스트입니다");
     }
 
-    if (postInfo.user_id !== userId)
-      throw new CustomError(
-        "본인의 포스트가 아닙니다",
-        StatusCodes.UNAUTHORIZED
-      );
+    if (postInfo.user_id !== userId) {
+      return res.status(401).send("본인의 포스트가 아닙니다");
+    }
     const result = await postInfo.update({
       opinion: opinion,
       title: title,
@@ -130,15 +109,13 @@ module.exports = {
   },
   debatePostList: async (req, res) => {
     const opinion = req.query.opinion;
+
     const result = await Post.findAll({
       where: { opinion: opinion },
       order: [["id", "DESC"]],
     });
     if (result === null) {
-      throw new CustomError(
-        "아직 포스트가 존재하지 않습니다.",
-        StatusCodes.NOT_FOUND
-      );
+      return res.status(204).send("아직 포스트가 존재하지 않습니다");
     }
     return res.status(200).send(result);
   },

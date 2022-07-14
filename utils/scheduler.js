@@ -5,7 +5,7 @@ const Debate = models.Debate;
 const Post = models.Post;
 const { archiveDebate, tokenSettlement } = require("./transactions");
 const { winFactor } = require("../config/rewardConfig");
-const { debateList } = require("./debateList");
+const { debateQueue } = require("./debateQueue");
 
 module.exports = {
   scheduleArchive: async () => {
@@ -37,8 +37,8 @@ module.exports = {
     });
 
     let newDebate =
-      debateList.length !== 0
-        ? debateList.shift()
+      debateQueue.length !== 0
+        ? debateQueue.shift()
         : {
             title: "TEST 게시 예정인 토론이 없습니다. TEST",
             content: "TEST 게시 예정인 토론이 없습니다. TEST",
@@ -149,7 +149,7 @@ module.exports = {
 
     const tokenResult = await tokenSettlement(mintUserList, burnUserList);
     console.log("tokenSettlement", tokenResult);
-    if (!tokenResult) return;
+    if (tokenResult.length === 0) return;
 
     //update DB expectedToken + currentToken => currentToken, expectedToken = 0, 모든 유저에 대해
     let allUser = await User.findAll();

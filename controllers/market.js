@@ -1,14 +1,10 @@
 require("dotenv").config();
-const MarketItem = require("../models/marketItem");
-const User = require("../models/user");
+const { MarketItem, User } = require("../models");
 const { Op } = require("sequelize");
 
 const getUserId = require("../utils/getUserId");
 const balanceCheck = require("../utils/balanceCheck");
 const nftBuy = require("../utils/transactions");
-
-const CustomError = require("../errors/custom-error");
-const StatusCodes = require("http-status-codes");
 
 module.exports = {
   itemList: async (req, res) => {
@@ -27,11 +23,8 @@ module.exports = {
   itemBuy: async (req, res) => {
     const itemId = req.params.id;
     const userId = await getUserId(req);
-    if (!userId)
-      throw new CustomError(
-        "로그인하지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
+    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
+
     //tokenId는 아이템아이디 쿼리해서 얻기
     //토큰아이디 0이면 트랜잭션은 보내지 않는걸로 수정
 
@@ -55,8 +48,9 @@ module.exports = {
     expectedToken -= itemPrice;
     currentToken -= itemPrice;
 
-    if (itemPrice > userBalance)
-      throw new CustomError("잔액이 부족합니다", StatusCodes.UNAUTHORIZED);
+    if (itemPrice > userBalance) {
+      return res.status(401).send("잔액이 부족합니다");
+    }
 
     if (tokenId === 0) {
       //nft가 아닌 일반  item

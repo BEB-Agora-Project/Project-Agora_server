@@ -1,6 +1,8 @@
 require("dotenv").config();
-const Debate = require("../models/debate");
-const { debateList } = require("../utils/debateList");
+const { Debate, Post } = require("../models");
+const { debateQueue } = require("../utils/debateQueue");
+const { asyncWrapper } = require("../errors/async");
+
 const CustomError = require("../errors/custom-error");
 const StatusCodes = require("http-status-codes");
 
@@ -13,12 +15,10 @@ module.exports = {
     return res.status(200).send(allPost);
   },
   currentDebate: async (req, res) => {
-    const recentPost = await Debate.findOne({
+    const recentDebate = await Debate.findOne({
       order: [["id", "DESC"]],
     });
-    //어떻게 코멘트를 같이 가져오지? 커멘트 가져오는게아니라 대표 포스트들만
-    const postId = recentPost.id;
-    //foreignKey를 이렇게 쓰는건지 모르겠음
+
     const agreePost = await Post.findOne({
       where: { opinion: 0 },
       order: [["up", "DESC"]],
@@ -34,7 +34,7 @@ module.exports = {
 
     //대표포스트만 가져와서 붙여넣기
     const result = {
-      post: recentPost,
+      debate: recentDebate,
       agreePost: agreePost,
       neutralPost: neutralPost,
       disagreePost: disagreePost,
@@ -42,23 +42,23 @@ module.exports = {
 
     return res.status(200).send(result);
   },
-  newDebatePush: (req, res) => {
+  newDebatePush: async (req, res) => {
+    //debateList 대기열에 추가
     const { title, content } = req.body;
     const obj = { title: title, content: content };
-    debateList.push(obj);
+    debateQueue.push(obj);
     return res.json(debateList);
   },
-  test: (req, res) => {
-    const { title, content } = req.body;
-    const obj = { title: title, content: content };
-    debateList.push(obj);
+  newDebateDB: async (req, res) => {
+    //DB에 추가
     let newDebate =
-      debateList.length !== 0
-        ? debateList.shift()
+      debateQueue.length !== 0
+        ? debateQueue.shift()
         : {
             title: "TEST 게시 예정인 토론이 없습니다. TEST",
             content: "TEST 게시 예정인 토론이 없습니다. TEST",
           };
-    return res.json(newDebate);
+    const result = await Debate.create(newDebate);
+    return res.send(result);
   },
 };
