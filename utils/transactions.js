@@ -41,7 +41,6 @@ async function sendTx(ABI, contractAddress, methodName, parameters) {
 
   const methodABI = findMethod(ABI, methodName); //ABI에서 원하는 method를 골라야됨
   const ABIencoded = caver.abi.encodeFunctionCall(methodABI, parameters);
-  console.log(ABIencoded);
 
   const options = {
     from: SERVER_ADDRESS,

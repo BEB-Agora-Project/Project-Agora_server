@@ -56,7 +56,7 @@ module.exports = {
     const curBalance = await balanceCheck(userId);
     const votePrice = VotePrice ** todayVoteCount;
     if (curBalance < votePrice) {
-      return res.status(401).send("잔액이 부족합니다");
+      return res.status(402).send("잔액이 부족합니다");
     }
     let curVote;
     if (vote === "up") {
@@ -97,7 +97,7 @@ module.exports = {
     }
 
     if (postInfo.user_id !== userId) {
-      return res.status(401).send("본인의 포스트가 아닙니다");
+      return res.status(403).send("본인의 포스트가 아닙니다");
     }
     const result = await postInfo.update({
       opinion: opinion,

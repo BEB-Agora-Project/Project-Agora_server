@@ -75,7 +75,7 @@ module.exports = {
     }
     const commentUser = commentInfo.user_id;
     if (commentUser !== userId) {
-      return res.status(401).send("본인 코멘트가 아닙니다");
+      return res.status(403).send("본인 코멘트가 아닙니다");
     }
 
     const result = await commentInfo.update({
