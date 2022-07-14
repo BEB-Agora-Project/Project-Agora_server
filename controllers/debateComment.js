@@ -47,7 +47,7 @@ module.exports = {
       return res.status(200).send({ curVote: curVote });
     } else if (vote === "down") {
       curVote = commentInfo.down;
-      curVote--;
+      curVote++;
       await commentInfo.update({
         down: curVote,
       });
@@ -86,6 +86,7 @@ module.exports = {
   },
   debatePostComments: async (req, res) => {
     const postId = req.params.post_id;
+    console.log(postId);
     const result = await Comment.findAll({ where: { post_id: postId } });
     if (result === null) {
       return res.status(204).send("아직 코멘트가 없습니다");

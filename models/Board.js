@@ -27,6 +27,12 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "cascade",
       onUpdate: "cascade",
     });
+    Board.belongsTo(models.User, {
+      foreignKey: "user_id",
+      sourceKey: "id",
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    });
   };
 
   return Board;

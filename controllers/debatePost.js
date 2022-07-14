@@ -5,6 +5,7 @@ const { asyncWrapper } = require("../errors/async");
 const { getUserId } = require("../utils/getUserId");
 
 const { debatePostReward, VotePrice } = require("../config/rewardConfig");
+const { StatusCodes } = require("http-status-codes");
 module.exports = {
   debatePostWrite: asyncWrapper(async (req, res) => {
     const { opinion, title, content } = req.body;
@@ -66,7 +67,7 @@ module.exports = {
       //upVote 반영
     } else if (vote === "down") {
       curVote = postInfo.down;
-      curVote--;
+      curVote++;
       await postInfo.update({ down: curVote });
       //downVote 반영
     } else {
@@ -107,16 +108,24 @@ module.exports = {
 
     return res.status(200).send(result);
   },
-  debatePostList: async (req, res) => {
+  debatePosts: async (req, res) => {
     const opinion = req.query.opinion;
 
     const result = await Post.findAll({
       where: { opinion: opinion },
       order: [["id", "DESC"]],
+      include: [{ model: User, attributes: ["username"] }],
     });
+
     if (result === null) {
       return res.status(204).send("아직 포스트가 존재하지 않습니다");
     }
+    return res.status(200).send(result);
+  },
+  debatePost: async (req, res) => {
+    const postId = req.params.post_id;
+    if (!postId) return res.status(404).send("not found");
+    const result = await Post.findByPk(postId);
     return res.status(200).send(result);
   },
 };
