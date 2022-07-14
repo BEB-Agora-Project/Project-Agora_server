@@ -13,16 +13,13 @@ module.exports = {
     if (!boardname) {
       throw new CustomError(
         "게시판 이름을 적어주세요",
-        StatusCodes.NOT_ACCEPTABLE
+        StatusCodes.BAD_REQUEST
       );
     }
 
     const userId = await getUserId(req);
     if (!userId) {
-      throw new CustomError(
-        "인가되지 않은 사용자입니다.",
-        StatusCodes.UNAUTHORIZED
-      );
+      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
 
     const balance = await balanceCheck(userId);

@@ -14,19 +14,15 @@ module.exports = {
 
     const userId = await getUserId(req);
     if (!userId) {
-      throw new CustomError(
-        "인가되지 않은 사용자입니다.",
-        StatusCodes.UNAUTHORIZED
-      );
+      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
 
     if (content === undefined || postId === undefined) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
-        StatusCodes.CONFLICT
+        StatusCodes.BAD_REQUEST
       );
     }
-    const postData = await Post.findByPk(postId);
 
     const newComment = await Comment.create({
       content: content,
@@ -34,7 +30,7 @@ module.exports = {
       post_id: postId,
     });
 
-    res
+    return res
       .status(StatusCodes.CREATED)
       .json({ status: "success", data: { commentId: newComment.id } });
   }),
@@ -44,21 +40,21 @@ module.exports = {
     if (content === undefined || commentId === undefined) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
-        StatusCodes.CONFLICT
+        StatusCodes.BAD_REQUEST
       );
     }
 
     const userId = await getUserId(req);
     if (!userId) {
-      throw new CustomError(
-        "인가되지 않은 사용자입니다.",
-        StatusCodes.UNAUTHORIZED
-      );
+      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
     const commentData = await Comment.findByPk(commentId);
 
     if (!commentData.user_id === userId) {
-      throw new CustomError(`올바른 사용자가 아닙니다`, StatusCodes.CONFLICT);
+      throw new CustomError(
+        "본인의 코멘트가 아닙니다.",
+        StatusCodes.METHOD_NOT_ALLOWED
+      );
     }
     await commentData.update({
       content: content,
@@ -75,16 +71,13 @@ Writing ID를 받아서 해당 writing에 대한 정보를 응답
     if (!commentId) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
-        StatusCodes.CONFLICT
+        StatusCodes.BAD_REQUEST
       );
     }
 
     const userId = await getUserId(req);
     if (!userId) {
-      throw new CustomError(
-        "인가되지 않은 사용자입니다.",
-        StatusCodes.UNAUTHORIZED
-      );
+      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
     const commentData = await Comment.findByPk(commentId);
     const commentUserId = commentData.user_id;
@@ -92,12 +85,15 @@ Writing ID를 받아서 해당 writing에 대한 정보를 응답
     if (!commentData) {
       throw new CustomError(
         `댓글번호 ${commentId} 가 존재하지 않습니다.`,
-        StatusCodes.CONFLICT
+        StatusCodes.NOT_FOUND
       );
     }
 
     if (commentUserId !== userId) {
-      throw new CustomError(`댓글 작성자가 아닙니다.`, StatusCodes.CONFLICT);
+      throw new CustomError(
+        `댓글 작성자가 아닙니다.`,
+        StatusCodes.METHOD_NOT_ALLOWED
+      );
     }
     // db에 저장
     await Comment.destroy({
@@ -111,7 +107,7 @@ Writing ID를 받아서 해당 writing에 대한 정보를 응답
     if (!postId) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
-        StatusCodes.CONFLICT
+        StatusCodes.BAD_REQUEST
       );
     }
     const comments = await Comment.findAll({ where: { post_id: postId } });
