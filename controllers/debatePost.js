@@ -1,4 +1,4 @@
-const { Post, Debate, User } = require("../models");
+const { Post, Debate, User, Comment } = require("../models");
 const { balanceCheck } = require("../utils/balanceCheck");
 const { asyncWrapper } = require("../errors/async");
 
@@ -113,7 +113,10 @@ module.exports = {
     const result = await Post.findAll({
       where: { opinion: opinion },
       order: [["id", "DESC"]],
-      include: [{ model: User, attributes: ["username"] }],
+      include: [
+        { model: User, attributes: ["username"] },
+        { model: Comment, attributes: ["id"] },
+      ],
     });
 
     if (result === null) {
@@ -123,10 +126,11 @@ module.exports = {
   },
   debatePost: async (req, res) => {
     const postId = req.params.post_id;
-    if (!postId) return res.status(404).send("not found");
+    if (!postId) return res.status(400).send("올바른 파라미터가 아닙니다");
     const result = await Post.findByPk(postId, {
       include: [{ model: User, attributes: ["username"] }],
     });
+    if (!result) return res.status(404).send("해당 게시글이 없습니다.");
     return res.status(200).send(result);
   },
   popularDebatePosts: async (req, res) => {
@@ -142,7 +146,10 @@ module.exports = {
         ["id", "DESC"],
         ["up", "DESC"],
       ],
-      include: [{ model: User, attributes: ["username"] }],
+      include: [
+        { model: User, attributes: ["username"] },
+        { model: Comment, attributes: ["id"] },
+      ],
     });
 
     return res.status(200).send(result);

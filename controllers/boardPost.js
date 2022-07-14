@@ -1,4 +1,4 @@
-const { Post, User, Comment } = require("../models");
+const { Post, User, Comment, Board } = require("../models");
 
 const { isAuthorized } = require("../middleware/webToken");
 const { asyncWrapper } = require("../errors/async");
@@ -6,7 +6,9 @@ const CustomError = require("../errors/custom-error");
 const StatusCodes = require("http-status-codes");
 const { getUserId } = require("../utils/getUserId");
 const { boardPostReward } = require("../config/rewardConfig");
-const { NOT_ACCEPTABLE } = require("http-status-codes");
+const Sequelize = require("sequelize");
+const { NOT_ACCEPTABLE, BAD_REQUEST } = require("http-status-codes");
+const post = require("../models/post");
 
 module.exports = {
   writeBoardPost: asyncWrapper(async (req, res) => {
@@ -16,16 +18,13 @@ module.exports = {
     if (title === undefined || content === undefined) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
-        StatusCodes.CONFLICT
+        StatusCodes.BAD_REQUEST
       );
     }
 
     const userId = await getUserId(req);
     if (!userId) {
-      throw new CustomError(
-        "인가되지 않은 사용자입니다.",
-        StatusCodes.UNAUTHORIZED
-      );
+      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
 
     const newPost = await Post.create({
@@ -55,38 +54,38 @@ module.exports = {
     if (title === undefined || content === undefined) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
-        StatusCodes.CONFLICT
+        StatusCodes.BAD_REQUEST
       );
     }
 
     const userId = await getUserId(req);
     if (!userId) {
-      throw new CustomError(
-        "인가되지 않은 사용자입니다.",
-        StatusCodes.UNAUTHORIZED
-      );
+      throw new CustomError("로그인이 필요합니다", StatusCodes.UNAUTHORIZED);
     }
 
     if (!postId) {
       throw new CustomError(
         "올바르지 않은 파라미터입니다.",
-        StatusCodes.NOT_FOUND
+        StatusCodes.BAD_REQUEST
       );
     }
 
     const postData = await Post.findOne({
-      where: { id: req.params.id },
+      where: { id: postId },
     });
 
     if (!postData) {
       throw new CustomError(
         `글번호 ${postId} 가 존재하지 않습니다.`,
-        StatusCodes.CONFLICT
+        StatusCodes.NOT_FOUND
       );
     }
 
     if (postData.user_id !== userId) {
-      throw new CustomError(`올바른 사용자가 아닙니다`, StatusCodes.CONFLICT);
+      throw new CustomError(
+        `올바른 사용자가 아닙니다`,
+        StatusCodes.METHOD_NOT_ALLOWED
+      );
     }
     await postData.update({
       title: title,
@@ -101,19 +100,22 @@ module.exports = {
     if (postId === undefined) {
       throw new CustomError(
         "올바른 파라미터가 아닙니다",
-        StatusCodes.NOT_ACCEPTABLE
+        StatusCodes.BAD_REQUEST
       );
     }
 
     const postData = await Post.findByPk(postId, {
-      include: [{ model: User, attributes: ["username"] }],
+      include: [
+        { model: User, attributes: ["username"] },
+        { model: Board, attributes: ["boardname"] },
+      ],
     });
 
     //해당 id를 가진 writing 없으면 에러 응답
     if (!postData) {
       throw new CustomError(
         `글번호 ${req.params.id} 가 존재하지 않습니다.`,
-        StatusCodes.CONFLICT
+        StatusCodes.BAD_REQUEST
       );
     }
     await postData.increment("hit");
@@ -127,10 +129,23 @@ module.exports = {
 
   getBoardPosts: asyncWrapper(async (req, res) => {
     const boardId = req.params.board_id;
+    if (!boardId) {
+      throw new CustomError(
+        "올바른 파라미터가 아닙니다",
+        StatusCodes.BAD_REQUEST
+      );
+    }
     const writings = await Post.findAll({
       where: { board_id: boardId },
       order: [["id", "DESC"]],
-      include: [{ model: User, attributes: ["username"] }],
+      include: [
+        { model: User, attributes: ["username"] },
+        { model: Board, attributes: ["boardname"] },
+        {
+          model: Comment,
+          attributes: ["id"],
+        },
+      ],
     });
     // Array에 map을 돌 때 콜백함수가 비동기면 일반적인 방법으로는 구현이 안됨
     // 그래서 Promise.all을 사용함
@@ -164,7 +179,7 @@ module.exports = {
   deleteBoardPost: asyncWrapper(async (req, res) => {
     const postId = req.params.post_id;
     if (postId === undefined) {
-      throw new CustomError("올바르지 않은 파라미터입니다", NOT_ACCEPTABLE);
+      throw new CustomError("올바르지 않은 파라미터입니다", BAD_REQUEST);
     }
     const postData = await Post.findByPk(postId);
 
@@ -179,12 +194,15 @@ module.exports = {
     if (!postData) {
       throw new CustomError(
         `글번호 ${postId} 가 존재하지 않습니다.`,
-        StatusCodes.CONFLICT
+        StatusCodes.NOT_FOUND
       );
     }
 
     if (postData.user_id !== userId) {
-      throw new CustomError(`게시글 작성자가 아닙니다.`, StatusCodes.CONFLICT);
+      throw new CustomError(
+        `게시글 작성자가 아닙니다.`,
+        StatusCodes.METHOD_NOT_ALLOWED
+      );
     }
     // db에 저장
     await Post.destroy({
@@ -227,13 +245,26 @@ module.exports = {
   }),
   getPopularBoardPosts: async (req, res) => {
     const boardId = req.params.board_id;
+    if (!boardId) {
+      throw new CustomError(
+        "올바른 파라미터가 아닙니다",
+        StatusCodes.BAD_REQUEST
+      );
+    }
     const result = await Post.findAll({
       where: { board_id: boardId },
       order: [
         ["id", "DESC"],
         ["up", "DESC"],
       ],
-      include: [{ model: User, attributes: ["username"] }],
+      include: [
+        { model: User, attributes: ["username"] },
+        { model: Board, attributes: ["boardname"] },
+        {
+          model: Comment,
+          attributes: ["id"],
+        },
+      ],
     });
 
     return res.status(200).send(result);

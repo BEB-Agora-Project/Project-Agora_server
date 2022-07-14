@@ -23,9 +23,9 @@ const {
 
 //comment
 router.post("/post/:post_id/comment", debateCommentWrite);
-router.post("/post/:post_id/comment/:comment_id", debateCommentVote); //up,down vote 인지 확인 ?vote=up
-router.put("/post/:post_id/comment/:comment_id", debateCommentEdit);
 router.get("/post/:post_id/comment/list", debatePostComments); // post의 커멘트 get
+router.post("/post/comment/:comment_id", debateCommentVote); //up,down vote 인지 확인 ?vote=up
+router.put("/post/comment/:comment_id", debateCommentEdit);
 
 //post
 router.get("/post/popular", popularDebatePosts);
