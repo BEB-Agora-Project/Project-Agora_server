@@ -9,14 +9,14 @@ const {
   debatePostWrite,
   debatePostVote,
   debatePostEdit,
-  debatePostList,
+  debatePosts,
+  debatePost,
 } = require("../controllers/debatePost");
 
 const {
   archiveList,
   currentDebate,
   newDebatePush,
-  test,
   newDebateDB,
 } = require("../controllers/debate");
 
@@ -24,13 +24,14 @@ const {
 router.post("/post/:post_id/comment", debateCommentWrite);
 router.post("/post/:post_id/comment/:comment_id", debateCommentVote); //up,down vote 인지 확인 ?vote=up
 router.put("/post/:post_id/comment/:comment_id", debateCommentEdit);
-router.get("/post/:post_id/comment", debatePostComments); // post의 커멘트 get
+router.get("/post/:post_id/comment/list", debatePostComments); // post의 커멘트 get
 
 //post
 router.post("/post", debatePostWrite);
 router.post("/post/:post_id", debatePostVote); //up,down vote 인지 확인 ?vote=up
 router.put("/post/:post_id", debatePostEdit);
-router.get("/post", debatePostList); //?opinion 에 따라 해당 포스트 리턴
+router.get("/post/list", debatePosts); //?opinion 에 따라 해당 포스트 리턴
+router.get("/post/:post_id", debatePost);
 
 //debate
 router.get("/archive", archiveList);

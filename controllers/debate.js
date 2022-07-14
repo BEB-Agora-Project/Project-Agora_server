@@ -47,7 +47,7 @@ module.exports = {
     const { title, content } = req.body;
     const obj = { title: title, content: content };
     debateQueue.push(obj);
-    return res.json(debateList);
+    return res.json(debateQueue);
   },
   newDebateDB: async (req, res) => {
     //DB에 추가
