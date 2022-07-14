@@ -125,7 +125,9 @@ module.exports = {
   debatePost: async (req, res) => {
     const postId = req.params.post_id;
     if (!postId) return res.status(404).send("not found");
-    const result = await Post.findByPk(postId);
+    const result = await Post.findByPk(postId, {
+      include: [{ model: User, attributes: ["username"] }],
+    });
     return res.status(200).send(result);
   },
 };

@@ -105,7 +105,9 @@ module.exports = {
       );
     }
 
-    const postData = await Post.findByPk(postId);
+    const postData = await Post.findByPk(postId, {
+      include: [{ model: User, attributes: ["username"] }],
+    });
 
     //해당 id를 가진 writing 없으면 에러 응답
     if (!postData) {
