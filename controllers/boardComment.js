@@ -110,7 +110,10 @@ Writing ID를 받아서 해당 writing에 대한 정보를 응답
         StatusCodes.BAD_REQUEST
       );
     }
-    const comments = await Comment.findAll({ where: { post_id: postId } });
+    const comments = await Comment.findAll({
+      where: { post_id: postId },
+      include: [{ model: User, attributes: ["username"] }],
+    });
 
     return res.status(StatusCodes.OK).send(comments);
   }),

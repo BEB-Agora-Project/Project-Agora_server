@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { Comment, Post } = require("../models");
+const { Comment, Post, User } = require("../models");
 const { getUserId } = require("../utils/getUserId");
 
 module.exports = {
@@ -76,7 +76,10 @@ module.exports = {
   debatePostComments: async (req, res) => {
     const postId = req.params.post_id;
     console.log(postId);
-    const result = await Comment.findAll({ where: { post_id: postId } });
+    const result = await Comment.findAll({
+      where: { post_id: postId },
+      include: [{ model: User, attributes: ["username"] }],
+    });
     if (result === null) {
       return res.status(204).send("아직 코멘트가 없습니다");
     }

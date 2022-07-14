@@ -147,6 +147,7 @@ module.exports = {
         },
       ],
     });
+
     // Array에 map을 돌 때 콜백함수가 비동기면 일반적인 방법으로는 구현이 안됨
     // 그래서 Promise.all을 사용함
     // const data = await Promise.all(
