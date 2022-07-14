@@ -132,7 +132,12 @@ module.exports = {
   },
   getPopularDebatePosts: async (req, res) => {
     const { opinion } = req.query;
-    const debateId = req.params.debate_id;
+
+    const recentDebate = await Debate.findOne({
+      order: [["id", "DESC"]],
+    });
+
+    const debateId = recentDebate.id;
     const result = await Post.findAll({
       where: { opinion: opinion, debate_id: debateId },
       order: [
