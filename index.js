@@ -9,6 +9,7 @@ const accountRoutes = require("./routes/account");
 const boardRoutes = require("./routes/board");
 const debateRoutes = require("./routes/debate");
 const marketRoutes = require("./routes/market");
+const errorHandler = require("./errors/error-handler");
 //테스트용 모듈입니다
 const { scheduleArchive, scheduleSettlement } = require("./utils/scheduler");
 
@@ -49,6 +50,9 @@ app.use("/board", boardRoutes);
 app.use("/nft", marketRoutes);
 app.use("/debate", debateRoutes);
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+//무조건 에러설정은 라우팅 설정 밑에넣는다
+app.use(errorHandler);
 
 //테스트용 경로입니다
 // app.post("/test", Test);
