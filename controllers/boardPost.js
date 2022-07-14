@@ -105,7 +105,9 @@ module.exports = {
       );
     }
 
-    const postData = await Post.findByPk(postId);
+    const postData = await Post.findByPk(postId, {
+      include: [{ model: User, attributes: ["username"] }],
+    });
 
     //해당 id를 가진 writing 없으면 에러 응답
     if (!postData) {
@@ -125,7 +127,11 @@ module.exports = {
 
   getBoardPosts: asyncWrapper(async (req, res) => {
     const boardId = req.params.board_id;
-    const writings = await Post.findAll({ where: { board_id: boardId } });
+    const writings = await Post.findAll({
+      where: { board_id: boardId },
+      order: [["id", "DESC"]],
+      include: [{ model: User, attributes: ["username"] }],
+    });
     // Array에 map을 돌 때 콜백함수가 비동기면 일반적인 방법으로는 구현이 안됨
     // 그래서 Promise.all을 사용함
     // const data = await Promise.all(
