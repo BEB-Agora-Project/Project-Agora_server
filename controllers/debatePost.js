@@ -5,7 +5,6 @@ const { asyncWrapper } = require("../errors/async");
 const { getUserId } = require("../utils/getUserId");
 
 const { debatePostReward, VotePrice } = require("../config/rewardConfig");
-const { StatusCodes } = require("http-status-codes");
 module.exports = {
   debatePostWrite: asyncWrapper(async (req, res) => {
     const { opinion, title, content } = req.body;
@@ -130,13 +129,12 @@ module.exports = {
     });
     return res.status(200).send(result);
   },
-  getPopularDebatePosts: async (req, res) => {
-    const { opinion } = req.query;
+  popularDebatePosts: async (req, res) => {
+    const opinion = req.query.opinion;
 
     const recentDebate = await Debate.findOne({
       order: [["id", "DESC"]],
     });
-
     const debateId = recentDebate.id;
     const result = await Post.findAll({
       where: { opinion: opinion, debate_id: debateId },

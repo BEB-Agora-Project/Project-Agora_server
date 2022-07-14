@@ -11,7 +11,7 @@ const {
   debatePostEdit,
   debatePosts,
   debatePost,
-  getPopularDebatePosts,
+  popularDebatePosts,
 } = require("../controllers/debatePost");
 
 const {
@@ -28,12 +28,12 @@ router.put("/post/:post_id/comment/:comment_id", debateCommentEdit);
 router.get("/post/:post_id/comment/list", debatePostComments); // post의 커멘트 get
 
 //post
+router.get("/post/popular", popularDebatePosts);
 router.post("/post", debatePostWrite);
 router.post("/post/:post_id", debatePostVote); //up,down vote 인지 확인 ?vote=up
 router.put("/post/:post_id", debatePostEdit);
 router.get("/post/list", debatePosts); //?opinion 에 따라 해당 포스트 리턴
 router.get("/post/:post_id", debatePost);
-router.get("/:debate_id/post/popular", getPopularDebatePosts);
 
 //debate
 router.get("/archive", archiveList);
