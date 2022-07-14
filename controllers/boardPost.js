@@ -6,9 +6,11 @@ const CustomError = require("../errors/custom-error");
 const StatusCodes = require("http-status-codes");
 const { getUserId } = require("../utils/getUserId");
 const { boardPostReward } = require("../config/rewardConfig");
+const { pagingSize } = require("../config/pagingConfig");
 const Sequelize = require("sequelize");
 const { NOT_ACCEPTABLE, BAD_REQUEST } = require("http-status-codes");
 const post = require("../models/post");
+const {paging,postSize} = require("../utils/paging")
 
 module.exports = {
   writeBoardPost: asyncWrapper(async (req, res) => {
@@ -146,6 +148,8 @@ module.exports = {
           attributes: ["id"],
         },
       ],
+      offset:paging(req.query.page,pagingSize),
+      limit:pagingSize
     });
 
     // Array에 map을 돌 때 콜백함수가 비동기면 일반적인 방법으로는 구현이 안됨

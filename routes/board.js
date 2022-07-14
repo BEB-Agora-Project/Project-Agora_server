@@ -20,10 +20,10 @@ const { makeBoard, getBoards } = require("../controllers/board");
 
 //board create
 //boardPost
-router.post("/:board_id/post", writeBoardPost);
-router.get("/:board_id/post/popular", getPopularBoardPosts);
-router.get("/:board_id/post", getBoardPosts);
-router.post("/post/:post_id", boardPostVote);
+router.post("/:board_id", writeBoardPost);
+router.get("/:board_id/popular", getPopularBoardPosts);
+router.get("/:board_id", getBoardPosts);
+router.post("/vote/:post_id", boardPostVote);
 router.get("/post/:post_id", getBoardPost);
 router.put("/post/:post_id", editBoardPost);
 router.delete("/post/:post_id", deleteBoardPost);

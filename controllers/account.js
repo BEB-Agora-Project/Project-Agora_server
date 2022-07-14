@@ -12,7 +12,7 @@ const Caver = require("caver-js");
 const caver = new Caver("https://api.baobab.klaytn.net:8651/");
 // const {mintToken} = require('./smartContract')
 const bcrypt = require("bcrypt");
-const { sendMailAuth, sendNewPassword } = require("../middleware/mailer");
+const { sendMailAuth, sendNewPassword } = require("../utils/mailer");
 const { boardPostVote } = require("./boardPost");
 
 module.exports = {
@@ -194,7 +194,6 @@ module.exports = {
       );
     } else {
       const decoded = await isAuthorized(req);
-      console.log(decoded.id);
       const userInfo = await User.findOne({
         where: { id: decoded.id },
       });
