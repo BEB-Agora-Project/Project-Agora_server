@@ -7,6 +7,7 @@ async function getUserId(req) {
   const userInfo = await User.findOne({
     where: { id: decoded.id },
   });
+  if (!userInfo) return false;
   const userId = userInfo.id;
   return userId;
 }
