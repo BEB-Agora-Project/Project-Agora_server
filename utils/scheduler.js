@@ -95,6 +95,7 @@ module.exports = {
     await disagreeUserInfo.update({
       expected_token: disagreeExpectedToken,
     });
+
     //DB Reward Done
 
     //새 토론 주제 설정, 걍 DB에 debateList.js에서 꺼내온담에 제일 최신으로 넣어주기.
@@ -156,18 +157,19 @@ module.exports = {
     let user;
     let settledToken;
     let userId;
-    let userInfo;
     for (let i = 0; i < allUser.length; i++) {
       user = allUser[i];
       settledToken = user.current_token + user.expected_token;
       userId = user.id;
 
-      userInfo = await User.findByPk(userId);
-      await userInfo.update({
-        current_token: settledToken,
-        expected_token: 0,
-        today_vote_count: 0,
-      });
+      await User.update(
+        {
+          current_token: settledToken,
+          expected_token: 0,
+          today_vote_count: 0,
+        },
+        { where: userId }
+      );
     }
 
     return;

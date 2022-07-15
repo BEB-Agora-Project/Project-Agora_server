@@ -3,7 +3,6 @@ const { balanceCheck } = require("../utils/balanceCheck");
 const { asyncWrapper } = require("../errors/async");
 const { pagingSize } = require("../config/pagingConfig");
 const { paging, postSize } = require("../utils/paging");
-const { queryPostKeyword } = require("../utils/queryPostKeyword");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
 
@@ -158,13 +157,14 @@ module.exports = {
   },
   getPopularDebatePostList: async (req, res) => {
     const opinion = req.query.opinion;
+    const page = req.query.opinion;
 
     const recentDebate = await Debate.findOne({
       order: [["id", "DESC"]],
     });
     const debateId = recentDebate.id;
     const result = await Post.findAll({
-      where: { opinion: opinion, debate_id: debateId },
+      where: { opinion: opinion, debate_id: debateId, up: { [Op.gte]: 10 } },
       order: [
         ["id", "DESC"],
         ["up", "DESC"],
@@ -173,6 +173,8 @@ module.exports = {
         { model: User, attributes: ["username"] },
         { model: Comment, attributes: ["id"] },
       ],
+      offset: paging(page, pagingSize),
+      limit: pagingSize,
     });
 
     return res.status(200).send(result);
