@@ -1,12 +1,17 @@
 const { Post, Debate, User, Comment } = require("../models");
 const { balanceCheck } = require("../utils/balanceCheck");
 const { asyncWrapper } = require("../errors/async");
+const { pagingSize } = require("../config/pagingConfig");
+const { paging, postSize } = require("../utils/paging");
+const { queryPostKeyword } = require("../utils/queryPostKeyword");
+const sequelize = require("sequelize");
+const Op = sequelize.Op;
 
 const { getUserId } = require("../utils/getUserId");
 
 const { debatePostReward, VotePrice } = require("../config/rewardConfig");
 module.exports = {
-  debatePostWrite: asyncWrapper(async (req, res) => {
+  writeDebatePost: asyncWrapper(async (req, res) => {
     const { opinion, title, content } = req.body;
     const userId = await getUserId(req);
     if (!userId) {
@@ -38,7 +43,7 @@ module.exports = {
 
     return res.status(201).send(result);
   }),
-  debatePostVote: async (req, res) => {
+  voteDebatePost: async (req, res) => {
     const vote = req.query.vote;
     const postId = req.params.post_id;
     const userId = await getUserId(req);
@@ -83,7 +88,7 @@ module.exports = {
 
     return res.status(200).send({ curVote: curVote });
   },
-  debatePostEdit: async (req, res) => {
+  editDebatePost: async (req, res) => {
     //response에 수정된 updatedAt 첨부
     const userId = await getUserId(req);
     if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
@@ -107,24 +112,42 @@ module.exports = {
 
     return res.status(200).send(result);
   },
-  debatePosts: async (req, res) => {
+  getDebatePostList: async (req, res) => {
     const opinion = req.query.opinion;
+    const page = req.query.page;
+    const keyword = req.query.keyword;
+    let result;
 
-    const result = await Post.findAll({
-      where: { opinion: opinion },
-      order: [["id", "DESC"]],
-      include: [
-        { model: User, attributes: ["username"] },
-        { model: Comment, attributes: ["id"] },
-      ],
-    });
+    if (!keyword) {
+      result = await Post.findAll({
+        where: { opinion: opinion },
+        order: [["id", "DESC"]],
+        include: [
+          { model: User, attributes: ["username"] },
+          { model: Comment, attributes: ["id"] },
+        ],
+        offset: paging(page, pagingSize),
+        limit: pagingSize,
+      });
+    } else {
+      result = await Post.findAll({
+        where: { opinion: opinion, title: { [Op.like]: "%" + keyword + "%" } },
+        order: [["id", "DESC"]],
+        include: [
+          { model: User, attributes: ["username"] },
+          { model: Comment, attributes: ["id"] },
+        ],
+        offset: paging(page, pagingSize),
+        limit: pagingSize,
+      });
+    }
 
     if (result === null) {
       return res.status(204).send("아직 포스트가 존재하지 않습니다");
     }
     return res.status(200).send(result);
   },
-  debatePost: async (req, res) => {
+  getDebatePost: async (req, res) => {
     const postId = req.params.post_id;
     if (!postId) return res.status(400).send("올바른 파라미터가 아닙니다");
     const result = await Post.findByPk(postId, {
@@ -133,7 +156,7 @@ module.exports = {
     if (!result) return res.status(404).send("해당 게시글이 없습니다.");
     return res.status(200).send(result);
   },
-  popularDebatePosts: async (req, res) => {
+  getPopularDebatePostList: async (req, res) => {
     const opinion = req.query.opinion;
 
     const recentDebate = await Debate.findOne({

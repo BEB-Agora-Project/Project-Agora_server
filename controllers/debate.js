@@ -1,20 +1,16 @@
 require("dotenv").config();
 const { Debate, Post } = require("../models");
 const { debateQueue } = require("../utils/debateQueue");
-const { asyncWrapper } = require("../errors/async");
-
-const CustomError = require("../errors/custom-error");
-const StatusCodes = require("http-status-codes");
 
 module.exports = {
-  archiveList: async (req, res) => {
+  getArchiveList: async (req, res) => {
     //DB Query, 진행중인 토론 제외하는 기능 추가, 또는 프론트에서 하나만 제외하고 표시
     const allPost = await Debate.findAll();
     //allPost의 정렬순이 최신순인지 오래된순인지 확인하고 pop()
     //걍 프론트에서 제일 최신 포스트 제외하고 보여주면됨
     return res.status(200).send(allPost);
   },
-  currentDebate: async (req, res) => {
+  getCurrentDebate: async (req, res) => {
     const recentDebate = await Debate.findOne({
       order: [["id", "DESC"]],
     });
@@ -42,14 +38,14 @@ module.exports = {
 
     return res.status(200).send(result);
   },
-  newDebatePush: async (req, res) => {
+  pushNewDebateQueue: async (req, res) => {
     //debateList 대기열에 추가
     const { title, content } = req.body;
     const obj = { title: title, content: content };
     debateQueue.push(obj);
     return res.json(debateQueue);
   },
-  newDebateDB: async (req, res) => {
+  pushNewDebateDB: async (req, res) => {
     //DB에 추가
     let newDebate =
       debateQueue.length !== 0
