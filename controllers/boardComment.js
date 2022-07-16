@@ -6,6 +6,7 @@ const { asyncWrapper } = require("../errors/async");
 const { getUserId } = require("../utils/getUserId");
 const CustomError = require("../errors/custom-error");
 const StatusCodes = require("http-status-codes");
+const {textFilter}=require("../utils/filtering")
 
 module.exports = {
   writeBoardPostComment: asyncWrapper(async (req, res) => {
@@ -22,6 +23,10 @@ module.exports = {
         "올바르지 않은 파라미터 값입니다.",
         StatusCodes.BAD_REQUEST
       );
+    }
+
+    if(await textFilter(content)){
+      throw new CustomError("댓글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
     }
 
     const newComment = await Comment.create({
@@ -56,6 +61,10 @@ module.exports = {
         StatusCodes.METHOD_NOT_ALLOWED
       );
     }
+    if(await textFilter(content)){
+      throw new CustomError("댓글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
+    }
+
     await commentData.update({
       content: content,
     });

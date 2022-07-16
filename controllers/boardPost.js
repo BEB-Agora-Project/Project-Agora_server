@@ -9,6 +9,7 @@ const { pagingSize } = require("../config/pagingConfig");
 const { NOT_ACCEPTABLE, BAD_REQUEST } = require("http-status-codes");
 const post = require("../models/post");
 const { paging, postSize } = require("../utils/paging");
+const {textFilter}=require("../utils/filtering")
 
 module.exports = {
   writeBoardPost: asyncWrapper(async (req, res) => {
@@ -25,6 +26,14 @@ module.exports = {
     const userId = await getUserId(req);
     if (!userId) {
       throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
+    }
+
+    if(await textFilter(title)){
+      throw new CustomError("게시글 제목에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
+    }
+
+    if(await textFilter(content)){
+      throw new CustomError("게시글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
     }
 
     const newPost = await Post.create({
@@ -86,6 +95,14 @@ module.exports = {
         `올바른 사용자가 아닙니다`,
         StatusCodes.METHOD_NOT_ALLOWED
       );
+    }
+
+    if(await textFilter(title)){
+      throw new CustomError("게시글 제목에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
+    }
+
+    if(await textFilter(content)){
+      throw new CustomError("게시글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
     }
     await postData.update({
       title: title,
