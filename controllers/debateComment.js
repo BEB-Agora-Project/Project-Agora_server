@@ -4,7 +4,7 @@ const { Comment, Post, User } = require("../models");
 const { getUserId } = require("../utils/getUserId");
 
 module.exports = {
-  debateCommentWrite: async (req, res) => {
+  writeDebateComment: async (req, res) => {
     const { content } = req.body;
     const postId = req.params.post_id;
 
@@ -21,7 +21,7 @@ module.exports = {
 
     return res.status(201).send(result);
   },
-  debateCommentVote: async (req, res) => {
+  voteDebateComment: async (req, res) => {
     const userId = await getUserId(req);
     if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
 
@@ -51,7 +51,7 @@ module.exports = {
       return res.status(400).send("올바르지 않은 요청입니다.");
     }
   },
-  debateCommentEdit: async (req, res) => {
+  editDebateComment: async (req, res) => {
     const userId = await getUserId(req);
     const { content } = req.body;
     const commentId = req.params.comment_id;
@@ -73,7 +73,7 @@ module.exports = {
 
     return res.status(200).send(result);
   },
-  debatePostComments: async (req, res) => {
+  getDebatePostCommentList: async (req, res) => {
     const postId = req.params.post_id;
     console.log(postId);
     const result = await Comment.findAll({

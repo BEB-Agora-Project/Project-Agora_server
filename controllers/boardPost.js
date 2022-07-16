@@ -1,13 +1,11 @@
 const { Post, User, Comment, Board } = require("../models");
 
-const { isAuthorized } = require("../middleware/webToken");
 const { asyncWrapper } = require("../errors/async");
 const CustomError = require("../errors/custom-error");
 const StatusCodes = require("http-status-codes");
 const { getUserId } = require("../utils/getUserId");
 const { boardPostReward } = require("../config/rewardConfig");
 const { pagingSize } = require("../config/pagingConfig");
-const Sequelize = require("sequelize");
 const { NOT_ACCEPTABLE, BAD_REQUEST } = require("http-status-codes");
 const post = require("../models/post");
 const { paging, postSize } = require("../utils/paging");
