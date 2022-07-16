@@ -12,7 +12,6 @@ const marketRoutes = require("./routes/market");
 const errorHandler = require("./errors/error-handler");
 //테스트용 모듈입니다
 const { scheduleArchive, scheduleSettlement } = require("./utils/scheduler");
-
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger/swagger-output.json");
 const https = require("https");
