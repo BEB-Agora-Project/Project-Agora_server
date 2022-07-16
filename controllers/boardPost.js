@@ -35,6 +35,14 @@ module.exports = {
     if(await textFilter(content)){
       throw new CustomError("게시글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
     }
+    const currentBoard =await Board.findOne({
+      where:{
+        id:boardId
+      }
+    })
+    if(!currentBoard){
+      throw new CustomError("존재하지 않는 게시판입니다.", StatusCodes.METHOD_NOT_ALLOWED);
+    }
 
     const newPost = await Post.create({
       opinion: 3,
