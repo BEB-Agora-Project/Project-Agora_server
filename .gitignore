@@ -1,4 +1,4 @@
 node_modules
-*.pem
+.idea
 .env
-
+*.pem

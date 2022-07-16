@@ -15,6 +15,7 @@ let sequelize = new Sequelize(
   development
 );
 
+
 fs.readdirSync(__dirname)
   .filter((file) => {
     return (
