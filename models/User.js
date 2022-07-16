@@ -1,85 +1,84 @@
-'use strict';
-const { Model } = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-    class User extends Model {
-        /**
-         * Helper method for defining associations.
-         * This method is not a part of Sequelize lifecycle.
-         * The `models/index` file will call this method automatically.
-         */
-        static associate (models) {
-            // define association here
-        }
+  class User extends Model {
+    static associate(models) {}
+  }
+  User.init(
+    {
+      username: {
+        type: DataTypes.STRING(30),
+        allowNull: false,
+      },
+      password: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
+      email: {
+        type: DataTypes.STRING(30),
+        allowNull: false,
+      },
+      address: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+      },
+      private_key: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+      },
+      current_token: {
+        type: DataTypes.INTEGER(255),
+        allowNull: false,
+        defaultValue: 0,
+      },
+      expected_token: {
+        type: DataTypes.INTEGER(255),
+        allowNull: false,
+        defaultValue: 0,
+      },
+      today_vote_count: {
+        type: DataTypes.INTEGER(100),
+        allowNull: false,
+        defaultValue: 0,
+      },
+      today_login: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      is_auth: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+    },
+    {
+      sequelize,
+      modelName: "User",
+      charset: "utf8",
+      collate: "utf8_general_ci",
+      underscored: true,
     }
-    User.init(
-        {
-            email: {
-                type:DataTypes.STRING(30),
-                allowNull: false, //필수값
-            },
-            username: {
-                type:DataTypes.STRING(30),
-                allowNull: false, //필수값
-            },
-            password: {
-                type:DataTypes.STRING(100),
-                allowNull: false, //필수값
-            },
-            address: {
-                type:DataTypes.STRING(100),
-                allowNull: true,
-            },
-            private_key: {
-                type:DataTypes.STRING(100),
-                allowNull: true,
-            },
-            current_token: {
-                type:DataTypes.INTEGER(100),
-                allowNull: false,
-                defaultValue: 0
-            },
-            expected_token: {
-                type:DataTypes.INTEGER(100),
-                allowNull: false,
-                defaultValue: 0
-            },
-            today_vote_count: {
-                type:DataTypes.INTEGER(100),
-                allowNull: false,
-                defaultValue: 0
-            },
-            today_login: {
-                type:DataTypes.BOOLEAN,
-                allowNull: false,
-                defaultValue: false
-            },
-            is_auth: {
-                type:DataTypes.BOOLEAN,
-                allowNull: false,
-                defaultValue: false
-            }
-        },
-        {
-            sequelize,
-            modelName: 'User',
-            charset: 'utf8',
-            collate: 'utf8_general_ci',
-            underscored:true
-        }
-    );
-    User.associate = function (models) {
-        User.hasMany(models.Post,{
-            foreignKey: "user_id",
-            sourceKey: "id",
-            onDelete: 'cascade',
-            onUpdate: 'cascade'
-        });
-        User.hasMany(models.Comment,{
-            foreignKey: "user_id",
-            sourceKey: "id",
-            onDelete: 'cascade',
-            onUpdate: 'cascade'
-        });
-    };
-    return User;
+  );
+  User.associate = function (models) {
+    User.hasMany(models.Post, {
+      foreignKey: "user_id",
+      sourceKey: "id",
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    });
+    User.hasMany(models.Comment, {
+      foreignKey: "user_id",
+      sourceKey: "id",
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    });
+    User.hasMany(models.MarketItem, {
+      foreignKey: "user_id",
+      sourceKey: "id",
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    });
+  };
+  return User;
 };
