@@ -29,4 +29,11 @@ const test = {
     //port: env.MYSQL_PORT
 };
 
-module.exports = { development, production, test };
+const initSetting = {
+    user: env.MYSQL_USERNAME,
+    password: env.MYSQL_PASSWORD,
+    database: "mysql",
+    host: env.MYSQL_HOST,
+};
+
+module.exports = { development, production, test,initSetting };

@@ -1,5 +1,5 @@
 module.exports = {};
-const { Post, User, Comment } = require("../models");
+const { Post, User, Comment, Board} = require("../models");
 
 const { isAuthorized } = require("../middleware/webToken");
 const { asyncWrapper } = require("../errors/async");
@@ -18,11 +18,20 @@ module.exports = {
       throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
 
-    if (content === undefined || postId === undefined) {
+    if (postId === undefined || content === undefined) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
         StatusCodes.BAD_REQUEST
       );
+    }
+
+    const currentBoard =await Post.findOne({
+      where:{
+        id:postId
+      }
+    })
+    if(!currentBoard){
+      throw new CustomError("존재하지 않는 게시글입니다.", StatusCodes.METHOD_NOT_ALLOWED);
     }
 
     if(await textFilter(content)){
@@ -54,6 +63,13 @@ module.exports = {
       throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
     const commentData = await Comment.findByPk(commentId);
+
+    if (!commentData) {
+      throw new CustomError(
+          "존재하지 않는 댓글입니다.",
+          StatusCodes.METHOD_NOT_ALLOWED
+      );
+    }
 
     if (!commentData.user_id === userId) {
       throw new CustomError(

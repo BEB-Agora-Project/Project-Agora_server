@@ -7,8 +7,6 @@ module.exports = {
         const textByLine = list.split('\n')
         for (let badText of textByLine){
             if(text.includes(badText)){
-                console.log(badText)
-                console.log(text)
                 return true
             }
         }
