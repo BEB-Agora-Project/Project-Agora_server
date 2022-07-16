@@ -47,40 +47,38 @@ app.use(errorHandler);
 // app.post("/test", Test);
 
 // 데이터베이스 생성
-serverInit.createDatabase().then(r => {
-        // 데이터베이스 연결
-        models.sequelize
-            .sync()
-            .then(() => {
-                console.log(" DB 연결 성공");
-            })
-            .catch((err) => {
-                console.log("연결 실패");
-                console.log(err);
-            });
+serverInit.createDatabase()
+// 데이터베이스 연결
+models.sequelize
+    .sync()
+    .then(() => {
+        console.log(" DB 연결 성공");
+    })
+    .catch((err) => {
+        console.log("연결 실패");
+        console.log(err);
+    });
 
-        //스케줄러
-        cron.schedule("0 10 3 * * *", () => {
-            scheduleSettlement();
-        });
-        cron.schedule("0 0 3 * * *", () => {
-            scheduleArchive();
-        });
-        // 서버 구동
-        if (fs.existsSync("./key.pem") && fs.existsSync("./cert.pem")) {
-            const privateKey = fs.readFileSync(__dirname + "/key.pem", "utf8");
-            const certificate = fs.readFileSync(__dirname + "/cert.pem", "utf8");
-            const credentials = {key: privateKey, cert: certificate};
-            let server = https.createServer(credentials, app);
-            server.listen(PORT, async () => {
-                console.log(`      🚀 HTTPS Server is starting on ${PORT}`);
-            });
-        } else {
-            app.listen(PORT, async () => {
-                console.log("you don't have cert.pem, key.pem!!");
-                console.log(`      🚀 HTTP Server is starting on ${PORT}`);
-            });
-        }
-    }
-)
+//스케줄러
+cron.schedule("0 10 3 * * *", () => {
+    scheduleSettlement();
+});
+cron.schedule("0 0 3 * * *", () => {
+    scheduleArchive();
+});
+// 서버 구동
+if (fs.existsSync("./key.pem") && fs.existsSync("./cert.pem")) {
+    const privateKey = fs.readFileSync(__dirname + "/key.pem", "utf8");
+    const certificate = fs.readFileSync(__dirname + "/cert.pem", "utf8");
+    const credentials = {key: privateKey, cert: certificate};
+    let server = https.createServer(credentials, app);
+    server.listen(PORT, async () => {
+        console.log(`      🚀 HTTPS Server is starting on ${PORT}`);
+    });
+} else {
+    app.listen(PORT, async () => {
+        console.log("you don't have cert.pem, key.pem!!");
+        console.log(`      🚀 HTTP Server is starting on ${PORT}`);
+    });
+}
 
