@@ -58,6 +58,7 @@ module.exports = {
     let expectedToken = userInfo.expected_token;
 
     const curBalance = await balanceCheck(userId);
+    console.log(curBalance);
     const votePrice = VotePrice ** todayVoteCount;
     if (curBalance < votePrice) {
       return res.status(402).send("잔액이 부족합니다");
