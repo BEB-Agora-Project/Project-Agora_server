@@ -16,8 +16,6 @@ module.exports = {
         return verifyResult;
       } catch (err) {
         console.log(err);
-      } finally {
-        return false;
       }
     } else {
       return false;
