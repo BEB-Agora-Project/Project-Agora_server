@@ -5,7 +5,7 @@ const development = {
   username: env.DEV_MYSQL_USERNAME,
   password: env.DEV_MYSQL_PASSWORD,
   database: env.DEV_MYSQL_DATABASE,
-  host: env.MYSQL_HOST,
+  host: env.DEV_MYSQL_HOST,
   dialect: "mysql",
   logging: false,
   //port: env.MYSQL_PORT
