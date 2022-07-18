@@ -159,11 +159,10 @@ module.exports = {
       );
     }
     await postData.increment("hit");
-    const incrementResult = await postData.reload();
 
     res.status(200).json({
       status: "success",
-      data: incrementResult,
+      data: postData,
     });
   }),
 
