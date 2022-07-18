@@ -10,10 +10,8 @@ const CustomError = require("../errors/custom-error");
 const StatusCodes = require("http-status-codes");
 const Caver = require("caver-js");
 const caver = new Caver("https://api.baobab.klaytn.net:8651/");
-// const {mintToken} = require('./smartContract')
 const bcrypt = require("bcrypt");
 const { sendMailAuth, sendNewPassword } = require("../utils/mailer");
-const { boardPostVote } = require("./boardPost");
 
 module.exports = {
   signIn: asyncWrapper(async (req, res, next) => {
@@ -203,7 +201,7 @@ module.exports = {
       res.status(StatusCodes.OK).send({ message: "ok" });
     }
   }),
-  getMyPage: async (req, res) => {
+  getMyPage: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
     if (!userId) {
       throw new CustomError(
@@ -227,7 +225,7 @@ module.exports = {
 
     const myPosts = await Post.findAll({
       where: { user_id: userId },
-      attributes: ["title", "hit"],
+      attributes: ["id", "title", "hit", "up", "created_at"],
       order: [["id", "DESC"]],
       include: [{ model: Comment, attributes: ["id"] }],
     });
@@ -243,8 +241,8 @@ module.exports = {
     };
 
     return res.status(200).send(returnObj);
-  },
-  getMyInfo: async (req, res) => {
+  }),
+  getMyInfo: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
     if (!userId) {
       throw new CustomError(
@@ -264,5 +262,5 @@ module.exports = {
     };
 
     return res.status(200).send(result);
-  },
+  }),
 };

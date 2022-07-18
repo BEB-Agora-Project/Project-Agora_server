@@ -11,10 +11,13 @@ module.exports = {
   isAuthorized: async (req) => {
     if (req.headers["authorization"]) {
       const token = req.headers["authorization"].split("Bearer ")[1];
-      if (token === undefined) {
+      try {
+        const verifyResult = verify(token, process.env.ACCESS_SECRET);
+        return verifyResult;
+      } catch (err) {
+        console.log(err);
+      } finally {
         return false;
-      } else {
-        return verify(token, process.env.ACCESS_SECRET);
       }
     } else {
       return false;
