@@ -180,9 +180,8 @@ module.exports = {
     if (!postData) return res.status(404).send("해당 게시글이 없습니다.");
 
     await postData.increment("hit");
-    const incrementResult = await postData.reload();
 
-    return res.status(200).send(incrementResult);
+    return res.status(200).send(postData);
   },
   getPopularDebatePostList: async (req, res) => {
     const opinion = req.query.opinion;
