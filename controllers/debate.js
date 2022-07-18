@@ -17,16 +17,19 @@ module.exports = {
 
     const agreePost = await Post.findAll({
       where: { opinion: 0 },
+      attributes: ["title", "up"],
       order: [["up", "DESC"]],
       limit: 5,
     });
     const neutralPost = await Post.findAll({
       where: { opinion: 1 },
+      attributes: ["title", "up"],
       order: [["up", "DESC"]],
       limit: 5,
     });
     const disagreePost = await Post.findAll({
       where: { opinion: 2 },
+      attributes: ["title", "up"],
       order: [["up", "DESC"]],
       limit: 5,
     });
