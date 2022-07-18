@@ -7,6 +7,7 @@ const {
   authEmail,
   findPassword,
   getMyPage,
+  getMyInfo,
 } = require("../controllers/account");
 
 router.post("/signin", signIn);
@@ -16,5 +17,6 @@ router.post("/password", findPassword);
 router.put("/username", editUsername);
 router.post("/auth", authEmail);
 router.get("/mypage", getMyPage);
+router.get("/myinfo", getMyInfo);
 
 module.exports = router;

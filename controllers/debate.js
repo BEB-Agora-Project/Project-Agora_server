@@ -15,17 +15,20 @@ module.exports = {
       order: [["id", "DESC"]],
     });
 
-    const agreePost = await Post.findOne({
+    const agreePost = await Post.findAll({
       where: { opinion: 0 },
       order: [["up", "DESC"]],
+      limit: 5,
     });
-    const neutralPost = await Post.findOne({
+    const neutralPost = await Post.findAll({
       where: { opinion: 1 },
       order: [["up", "DESC"]],
+      limit: 5,
     });
-    const disagreePost = await Post.findOne({
+    const disagreePost = await Post.findAll({
       where: { opinion: 2 },
       order: [["up", "DESC"]],
+      limit: 5,
     });
 
     //대표포스트만 가져와서 붙여넣기

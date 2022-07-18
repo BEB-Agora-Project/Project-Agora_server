@@ -7,6 +7,7 @@ const sequelize = require("sequelize");
 const Op = sequelize.Op;
 
 const { getUserId } = require("../utils/getUserId");
+const { textFilter } = require("../utils/filtering");
 
 const { debatePostReward, VotePrice } = require("../config/rewardConfig");
 module.exports = {
@@ -17,6 +18,17 @@ module.exports = {
       return res.status(401).send("로그인하지 않은 사용자입니다");
     }
 
+    if (await textFilter(title)) {
+      return res
+        .status(400)
+        .send("게시글 제목에 사용할 수 없는 문자열이 포함되어 있습니다.");
+    }
+
+    if (await textFilter(content)) {
+      return res
+        .status(400)
+        .send("게시글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.");
+    }
     const recentDebate = await Debate.findOne({
       order: [["id", "DESC"]],
     });
@@ -58,6 +70,7 @@ module.exports = {
     let expectedToken = userInfo.expected_token;
 
     const curBalance = await balanceCheck(userId);
+    console.log(curBalance);
     const votePrice = VotePrice ** todayVoteCount;
     if (curBalance < votePrice) {
       return res.status(402).send("잔액이 부족합니다");
@@ -95,6 +108,18 @@ module.exports = {
     const postId = req.params.post_id;
 
     const { opinion, title, content } = req.body;
+
+    if (await textFilter(title)) {
+      return res
+        .status(400)
+        .send("게시글 제목에 사용할 수 없는 문자열이 포함되어 있습니다.");
+    }
+
+    if (await textFilter(content)) {
+      return res
+        .status(400)
+        .send("게시글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.");
+    }
     const postInfo = await Post.findByPk(postId);
     if (postInfo === null) {
       return res.status(404).send("존재하지 않는 포스트입니다");

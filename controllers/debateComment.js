@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const { Comment, Post, User } = require("../models");
 const { getUserId } = require("../utils/getUserId");
+const { textFilter } = require("../utils/filtering");
 
 module.exports = {
   writeDebateComment: async (req, res) => {
@@ -12,6 +13,11 @@ module.exports = {
     if (post === null) return res.send(404).send("존재하지 않는 포스트입니다");
     const userId = await getUserId(req);
     if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
+    if (await textFilter(content)) {
+      return res
+        .status(400)
+        .send("댓글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.");
+    }
 
     const result = await Comment.create({
       content: content,
@@ -57,6 +63,12 @@ module.exports = {
     const commentId = req.params.comment_id;
 
     if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
+
+    if (await textFilter(content)) {
+      return res
+        .status(400)
+        .send("댓글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.");
+    }
 
     const commentInfo = await Comment.findByPk(commentId);
     if (commentInfo === null) {

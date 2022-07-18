@@ -4,8 +4,8 @@ const { User } = require("../models");
 
 async function balanceCheck(userId) {
   const userInfo = await User.findByPk(userId);
-  const currentToken = userInfo.currentToken;
-  const expectedToken = userInfo.expectedToken;
+  const currentToken = userInfo.current_token;
+  const expectedToken = userInfo.expected_token;
   const currentTokenBalance = currentToken + expectedToken;
 
   return currentTokenBalance;
