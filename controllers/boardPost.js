@@ -7,10 +7,10 @@ const { getUserId } = require("../utils/getUserId");
 const { boardPostReward } = require("../config/rewardConfig");
 const { pagingSize } = require("../config/pagingConfig");
 const { NOT_ACCEPTABLE, BAD_REQUEST } = require("http-status-codes");
-const post = require("../models/post");
 const { paging, postSize } = require("../utils/paging");
-const {textFilter}=require("../utils/filtering")
-
+const { textFilter } = require("../utils/filtering");
+const sequelize = require("sequelize");
+const Op = sequelize.Op;
 module.exports = {
   writeBoardPost: asyncWrapper(async (req, res) => {
     const { title, content } = req.body;
@@ -28,20 +28,29 @@ module.exports = {
       throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
 
-    if(await textFilter(title)){
-      throw new CustomError("게시글 제목에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
+    if (await textFilter(title)) {
+      throw new CustomError(
+        "게시글 제목에 사용할 수 없는 문자열이 포함되어 있습니다.",
+        StatusCodes.CONFLICT
+      );
     }
 
-    if(await textFilter(content)){
-      throw new CustomError("게시글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
+    if (await textFilter(content)) {
+      throw new CustomError(
+        "게시글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.",
+        StatusCodes.CONFLICT
+      );
     }
-    const currentBoard =await Board.findOne({
-      where:{
-        id:boardId
-      }
-    })
-    if(!currentBoard){
-      throw new CustomError("존재하지 않는 게시판입니다.", StatusCodes.METHOD_NOT_ALLOWED);
+    const currentBoard = await Board.findOne({
+      where: {
+        id: boardId,
+      },
+    });
+    if (!currentBoard) {
+      throw new CustomError(
+        "존재하지 않는 게시판입니다.",
+        StatusCodes.METHOD_NOT_ALLOWED
+      );
     }
 
     const newPost = await Post.create({
@@ -105,12 +114,18 @@ module.exports = {
       );
     }
 
-    if(await textFilter(title)){
-      throw new CustomError("게시글 제목에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
+    if (await textFilter(title)) {
+      throw new CustomError(
+        "게시글 제목에 사용할 수 없는 문자열이 포함되어 있습니다.",
+        StatusCodes.CONFLICT
+      );
     }
 
-    if(await textFilter(content)){
-      throw new CustomError("게시글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
+    if (await textFilter(content)) {
+      throw new CustomError(
+        "게시글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.",
+        StatusCodes.CONFLICT
+      );
     }
     await postData.update({
       title: title,
@@ -154,26 +169,54 @@ module.exports = {
 
   getBoardPosts: asyncWrapper(async (req, res) => {
     const boardId = req.params.board_id;
+    const page = req.query.page;
+    const keyword = req.query.keyword;
     if (!boardId) {
       throw new CustomError(
         "올바른 파라미터가 아닙니다",
         StatusCodes.BAD_REQUEST
       );
     }
-    const writings = await Post.findAll({
-      where: { board_id: boardId },
-      order: [["id", "DESC"]],
-      include: [
-        { model: User, attributes: ["username"] },
-        { model: Board, attributes: ["boardname"] },
-        {
-          model: Comment,
-          attributes: ["id"],
-        },
-      ],
-      offset: paging(req.query.page, pagingSize),
-      limit: pagingSize,
-    });
+
+    let result;
+
+    if (!keyword) {
+      result = await Post.findAll({
+        where: { board_id: boardId },
+        order: [["id", "DESC"]],
+        include: [
+          { model: User, attributes: ["username"] },
+          { model: Comment, attributes: ["id"] },
+        ],
+        offset: paging(page, pagingSize),
+        limit: pagingSize,
+      });
+    } else {
+      result = await Post.findAll({
+        where: { board_id: boardId, title: { [Op.like]: "%" + keyword + "%" } },
+        order: [["id", "DESC"]],
+        include: [
+          { model: User, attributes: ["username"] },
+          { model: Comment, attributes: ["id"] },
+        ],
+        offset: paging(page, pagingSize),
+        limit: pagingSize,
+      });
+    }
+    // const writings = await Post.findAll({
+    //   where: { board_id: boardId },
+    //   order: [["id", "DESC"]],
+    //   include: [
+    //     { model: User, attributes: ["username"] },
+    //     { model: Board, attributes: ["boardname"] },
+    //     {
+    //       model: Comment,
+    //       attributes: ["id"],
+    //     },
+    //   ],
+    //   offset: paging(req.query.page, pagingSize),
+    //   limit: pagingSize,
+    // });
 
     // Array에 map을 돌 때 콜백함수가 비동기면 일반적인 방법으로는 구현이 안됨
     // 그래서 Promise.all을 사용함
@@ -201,7 +244,7 @@ module.exports = {
     // );
     res.status(200).json({
       status: "success",
-      data: writings,
+      data: result,
     });
   }),
   deleteBoardPost: asyncWrapper(async (req, res) => {
@@ -273,6 +316,7 @@ module.exports = {
   }),
   getPopularBoardPosts: async (req, res) => {
     const boardId = req.params.board_id;
+    const page = req.query.opinion;
     if (!boardId) {
       throw new CustomError(
         "올바른 파라미터가 아닙니다",
@@ -280,7 +324,7 @@ module.exports = {
       );
     }
     const result = await Post.findAll({
-      where: { board_id: boardId },
+      where: { board_id: boardId, up: { [Op.gte]: 10 } },
       order: [
         ["id", "DESC"],
         ["up", "DESC"],
@@ -293,6 +337,8 @@ module.exports = {
           attributes: ["id"],
         },
       ],
+      offset: paging(page, pagingSize),
+      limit: pagingSize,
     });
 
     return res.status(200).send(result);
