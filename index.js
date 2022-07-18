@@ -18,7 +18,7 @@ const swaggerFile = require("./swagger/swagger-output.json");
 const https = require("https");
 const fs = require("fs");
 const app = express();
-const PORT = process.env.HTTPS_PORT;
+const PORT = process.env.PORT || 8080;
 
 // api 통신을 위한 모듈 설정
 app.use(cookieParser());
