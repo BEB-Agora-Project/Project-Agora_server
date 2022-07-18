@@ -1,4 +1,4 @@
-const { User, Auth, Post, MarketItem, Board } = require("../models");
+const { User, Auth, Post, MarketItem, Board, Comment } = require("../models");
 const {
   generateAccessToken,
   sendAccessToken,
@@ -218,13 +218,20 @@ module.exports = {
       "current_token",
       "expected_token",
       "today_vote_count",
+      "created_at",
     ];
     const userInfo = await User.findOne({
       where: { id: userId },
       attributes: attributes,
     });
 
-    const myPosts = await Post.findAll({ where: { user_id: userId } });
+    const myPosts = await Post.findAll({
+      where: { user_id: userId },
+      attributes: ["title", "hit"],
+      order: [["id", "DESC"]],
+      include: [{ model: Comment, attributes: ["id"] }],
+    });
+
     const myItem = await MarketItem.findAll({ where: { user_id: userId } });
     const myBoard = await Board.findAll({ where: { user_id: userId } });
 
@@ -236,5 +243,26 @@ module.exports = {
     };
 
     return res.status(200).send(returnObj);
+  },
+  getMyInfo: async (req, res) => {
+    const userId = await getUserId(req);
+    if (!userId) {
+      throw new CustomError(
+        "로그인되지 않은 사용자입니다",
+        StatusCodes.UNAUTHORIZED
+      );
+    }
+    const userInfo = await User.findOne({
+      where: { id: userId },
+      attributes: ["username", "email", "current_token", "expected_token"],
+    });
+
+    const result = {
+      username: userInfo.username,
+      email: userInfo.email,
+      token: userInfo.expected_token + userInfo.current_token,
+    };
+
+    return res.status(200).send(result);
   },
 };
