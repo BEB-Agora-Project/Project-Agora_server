@@ -174,11 +174,15 @@ module.exports = {
   getDebatePost: async (req, res) => {
     const postId = req.params.post_id;
     if (!postId) return res.status(400).send("올바른 파라미터가 아닙니다");
-    const result = await Post.findByPk(postId, {
+    const postData = await Post.findByPk(postId, {
       include: [{ model: User, attributes: ["username"] }],
     });
-    if (!result) return res.status(404).send("해당 게시글이 없습니다.");
-    return res.status(200).send(result);
+    if (!postData) return res.status(404).send("해당 게시글이 없습니다.");
+
+    await postData.increment("hit");
+    const incrementResult = await postData.reload();
+
+    return res.status(200).send(incrementResult);
   },
   getPopularDebatePostList: async (req, res) => {
     const opinion = req.query.opinion;

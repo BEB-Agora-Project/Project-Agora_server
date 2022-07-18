@@ -225,7 +225,7 @@ module.exports = {
 
     const myPosts = await Post.findAll({
       where: { user_id: userId },
-      attributes: ["title", "hit"],
+      attributes: ["id", "title", "hit", "up", "created_at"],
       order: [["id", "DESC"]],
       include: [{ model: Comment, attributes: ["id"] }],
     });
