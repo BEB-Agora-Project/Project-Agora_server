@@ -81,13 +81,19 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "cascade",
       onUpdate: "cascade",
     });
-    User.hasMany(models.NFTItem, {
+    User.hasMany(models.Recomment, {
       foreignKey: "user_id",
       sourceKey: "id",
       onDelete: "cascade",
       onUpdate: "cascade",
     });
-    User.hasMany(models.NormalItemList, {
+    User.hasMany(models.Nftitem, {
+      foreignKey: "user_id",
+      sourceKey: "id",
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    });
+    User.hasMany(models.Normalitemlist, {
       foreignKey: "user_id",
       sourceKey: "id",
       onDelete: "cascade",

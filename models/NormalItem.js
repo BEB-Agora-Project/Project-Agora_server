@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class NormalItem extends Model {
+  class Normalitem extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {}
   }
-  NormalItem.init(
+  Normalitem.init(
     {
       itemname: {
         type: DataTypes.STRING(300),
@@ -22,15 +22,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "NormalItem",
+      modelName: "Normalitem",
       charset: "utf8",
       collate: "utf8_general_ci",
       underscored: true,
     }
   );
 
-  NormalItem.associate = function (models) {
-    NormalItem.hasMany(models.NormalItemList, {
+  Normalitem.associate = function (models) {
+    Normalitem.hasMany(models.Normalitemlist, {
       foreignKey: "normal_item_id",
       sourceKey: "id",
       onDelete: "cascade",
@@ -38,5 +38,5 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
-  return NormalItem;
+  return Normalitem;
 };

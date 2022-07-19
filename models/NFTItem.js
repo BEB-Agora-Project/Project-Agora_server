@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "NFTItem",
+      modelName: "Nftitem",
       charset: "utf8",
       collate: "utf8_general_ci",
       underscored: true,

@@ -1,73 +1,76 @@
 require("dotenv").config();
-const { MarketItem, User } = require("../models");
+const { Nftitem, Normalitem, Normalitemlist, User } = require("../models");
 const { Op } = require("sequelize");
 
-const getUserId = require("../utils/getUserId");
-const balanceCheck = require("../utils/balanceCheck");
+const { getUserId } = require("../utils/getUserId");
+const { balanceCheck } = require("../utils/balanceCheck");
 const nftBuy = require("../utils/transactions");
 
 module.exports = {
-  itemList: async (req, res) => {
-    const nftItems = await MarketItem.findAll({
-      where: { token_id: { [Op.gt]: 0 } },
-    });
-    let normalItemList = ["1", "2"];
-    const normalItems = await MarketItem.findAll({
-      where: { token_id: 0, token_uri: { [Op.in]: normalItemList } },
-      group: ["token_uri"],
-    });
-    //중복되는 일반 아이템들의 종류 구분할때는  먼저 tokenId 0으로 찾고나서 tokenURI "1", "2" 로 종류 구분해서 찾아오기
-    const result = { nftItems: nftItems, normalItems: normalItems };
+  getNFTItemList: async (req, res) => {
+    const result = await Nftitem.findAll();
     return res.status(200).send(result);
   },
-  itemBuy: async (req, res) => {
-    const itemId = req.params.id;
+  buyNFTItem: async (req, res) => {
+    const { nftId } = req.body;
     const userId = await getUserId(req);
-    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
+    if (!userId) {
+      return res.status(401).send("로그인하지 않은 사용자입니다");
+    }
 
-    //tokenId는 아이템아이디 쿼리해서 얻기
-    //토큰아이디 0이면 트랜잭션은 보내지 않는걸로 수정
+    const nftInfo = await Nftitem.findByPk(nftId);
+    const userInfo = await User.findByPk(userId);
+
+    let currentToken = userInfo.current_token;
+    const price = nftInfo.price;
+    const tokenId = nftInfo.token_id;
+    const userAddress = userInfo.address;
+
+    if (currentToken < price) {
+      return res.status(402).send("컨트랙트에 보유중인 토큰이 부족합니다.");
+    }
+
+    res.status(102).send("NFT 구매요청이 전송되었습니다.");
+
+    //item이 nft라는 뜻
+    await nftInfo.update({ sold: true, user_id: userId });
+    await userInfo.update({ current_token: currentToken });
+    const parameters = [userAddress, tokenId, price];
+    await nftBuy(parameters);
+  },
+  getNormalItemList: async (req, res) => {
+    const result = await Normalitem.findAll();
+    return res.status(200).send(result);
+  },
+  buyNormalItem: async (req, res) => {
+    const { itemId } = req.body;
+
+    const userId = await getUserId(req);
+    if (!userId) {
+      return res.status(401).send("로그인하지 않은 사용자입니다");
+    }
+
+    const itemInfo = await Normalitem.findByPk(itemId);
+    const price = itemInfo.price;
+
+    const curBalance = await balanceCheck(userId);
+
+    if (curBalance < price) {
+      return res.status(402).send("잔액이 부족합니다.");
+    }
 
     const userInfo = await User.findByPk(userId);
-    const itemInfo = await MarketItem.findByPk(itemId);
-    if (itemInfo === null) {
-      throw new CustomError(
-        "존재하지 않는 아이템입니다.",
-        StatusCodes.NOT_FOUND
-      );
-    }
 
-    const tokenId = itemInfo.token_id;
-
-    const itemPrice = itemInfo.price;
-    const userAddress = userInfo.address;
-    const userBalance = await balanceCheck(userId);
     let expectedToken = userInfo.expected_token;
-    let currentToken = userInfo.current_token;
 
-    expectedToken -= itemPrice;
-    currentToken -= itemPrice;
+    expectedToken -= price;
 
-    if (itemPrice > userBalance) {
-      return res.status(401).send("잔액이 부족합니다");
-    }
+    await userInfo.update({ expected_token: expectedToken });
+    await Normalitemlist.create({
+      normal_item_id: itemId,
+      user_id: userId,
+    });
 
-    if (tokenId === 0) {
-      //nft가 아닌 일반  item
-
-      await itemInfo.update({
-        sold: true,
-        user_id: userId,
-      });
-      await userInfo.update({ expected_token: expectedToken });
-    }
-    res.status(102).send("Transaction Requested");
-    if (tokenId > 0) {
-      //item이 nft라는 뜻
-      await itemInfo.update({ sold: true, user_id: userId });
-      await userInfo.update({ current_token: currentToken });
-      const parameters = [userAddress, tokenId, itemPrice];
-      await nftBuy(parameters);
-    }
+    return res.status(200).send("샀습니다");
   },
 };

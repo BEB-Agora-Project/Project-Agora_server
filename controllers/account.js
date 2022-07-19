@@ -1,4 +1,14 @@
-const { User, Auth, Post, MarketItem, Board, Comment } = require("../models");
+const {
+  User,
+  Auth,
+  Post,
+  MarketItem,
+  Board,
+  Comment,
+  Normalitemlist,
+  Normalitem,
+  Nftitem,
+} = require("../models");
 const {
   generateAccessToken,
   sendAccessToken,
@@ -255,11 +265,22 @@ module.exports = {
       attributes: ["username", "email", "current_token", "expected_token"],
     });
 
+    const myItem = await Normalitemlist.findAll({
+      where: { user_id: userId },
+      include: [{ model: Normalitem }],
+    });
+
+    const myNFT = await Nftitem.findAll({
+      where: { user_id: userId },
+    });
+
     const result = {
-      userId : userId
+      userId: userId,
       username: userInfo.username,
       email: userInfo.email,
       token: userInfo.expected_token + userInfo.current_token,
+      nft: myNFT,
+      item: myItem,
     };
 
     return res.status(200).send(result);

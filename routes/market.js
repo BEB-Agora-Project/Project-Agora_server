@@ -1,8 +1,5 @@
 const router = require("express").Router();
 
-const { itemList, itemBuy } = require("../controllers/market");
-
-router.get("/", itemList);
-router.post("/:id", itemBuy);
+// router.get("/", itemList)
 
 module.exports = router;
