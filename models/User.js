@@ -46,6 +46,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: false,
       },
+      profile_image: {
+        type: DataTypes.STRING(300),
+        allowNull: true,
+      },
+      badge: {
+        type: DataTypes.STRING(300),
+        allowNull: true,
+      },
       is_auth: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
@@ -73,7 +81,13 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "cascade",
       onUpdate: "cascade",
     });
-    User.hasMany(models.MarketItem, {
+    User.hasMany(models.NFTItem, {
+      foreignKey: "user_id",
+      sourceKey: "id",
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    });
+    User.hasMany(models.NormalItemList, {
       foreignKey: "user_id",
       sourceKey: "id",
       onDelete: "cascade",
