@@ -256,6 +256,7 @@ module.exports = {
     });
 
     const result = {
+      userId : userId
       username: userInfo.username,
       email: userInfo.email,
       token: userInfo.expected_token + userInfo.current_token,
