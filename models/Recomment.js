@@ -1,33 +1,33 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Board extends Model {
+  class Recomment extends Model {
     static associate(models) {}
   }
-  Board.init(
+  Recomment.init(
     {
-      boardname: {
-        type: DataTypes.STRING(30),
+      content: {
+        type: DataTypes.STRING(500),
         allowNull: false,
       },
     },
     {
       sequelize,
-      modelName: "Board",
+      modelName: "Recomment",
       charset: "utf8",
       collate: "utf8_general_ci",
       underscored: true,
     }
   );
 
-  Board.associate = function (models) {
-    Board.hasMany(models.Post, {
-      foreignKey: "board_id",
-      sourceKey: "id",
+  Recomment.associate = function (models) {
+    Recomment.belongsTo(models.Comment, {
+      foreignKey: "comment_id",
+      targetKey: "id",
       onDelete: "cascade",
       onUpdate: "cascade",
     });
-    Board.belongsTo(models.User, {
+    Recomment.belongsTo(models.User, {
       foreignKey: "user_id",
       targetKey: "id",
       onDelete: "cascade",
@@ -35,5 +35,5 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
-  return Board;
+  return Recomment;
 };
