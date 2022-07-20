@@ -246,9 +246,22 @@ module.exports = {
       include: [{ model: Normalitem, attributes: ["id", "itemname"] }],
     });
 
-    const myNFT = await Nftitem.findAll({
+    const nfts = await Nftitem.findAll({
       where: { user_id: userId },
     });
+    const arr = await Promise.all(
+      nfts.map(async (el) => {
+        const res = await axios.get(el.tokenURI);
+        const metaData = res.data;
+        return metaData;
+      })
+    );
+
+    const myNFT = [];
+    for (let i = 0; i < nfts.length; i++) {
+      myNFT.push(Object.assign(arr[i], nfts[i]));
+    }
+
     const myBoard = await Board.findAll({ where: { user_id: userId } });
 
     const returnObj = {
@@ -280,9 +293,21 @@ module.exports = {
       include: [{ model: Normalitem, attributes: ["id", "itemname"] }],
     });
 
-    const myNFT = await Nftitem.findAll({
+    const nfts = await Nftitem.findAll({
       where: { user_id: userId },
     });
+    const arr = await Promise.all(
+      nfts.map(async (el) => {
+        const res = await axios.get(el.tokenURI);
+        const metaData = res.data;
+        return metaData;
+      })
+    );
+
+    const myNFT = [];
+    for (let i = 0; i < nfts.length; i++) {
+      myNFT.push(Object.assign(arr[i], nfts[i]));
+    }
 
     const result = {
       userId: userId,

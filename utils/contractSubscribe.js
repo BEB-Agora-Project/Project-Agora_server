@@ -39,7 +39,7 @@ module.exports = {
         });
 
         const userId = userInfo.id;
-        const currentToken = userInfo.current_token;
+        let currentToken = userInfo.current_token;
         currentToken -= price;
 
         await userInfo.update({ current_token: currentToken });
@@ -61,7 +61,7 @@ module.exports = {
           where: { address: buyerAddress },
         });
 
-        const currentToken = userInfo.current_token;
+        let currentToken = userInfo.current_token;
         currentToken -= price;
 
         await userInfo.update({ current_token: currentToken });
