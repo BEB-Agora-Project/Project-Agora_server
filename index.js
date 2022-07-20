@@ -12,7 +12,7 @@ const marketRoutes = require("./routes/market");
 const errorHandler = require("./errors/error-handler");
 //테스트용 모듈입니다
 const {scheduleArchive, scheduleSettlement} = require("./utils/scheduler");
-const serverInit = require("./serverInit/database")
+const {connectDatabase} = require("./serverInit/database")
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger/swagger-output.json");
 const https = require("https");
@@ -46,26 +46,17 @@ app.use(errorHandler);
 //테스트용 경로입니다
 // app.post("/test", Test);
 
-// 데이터베이스 생성
-serverInit.createDatabase()
 // 데이터베이스 연결
-models.sequelize
-    .sync()
-    .then(() => {
-        console.log(" DB 연결 성공");
-    })
-    .catch((err) => {
-        console.log("연결 실패");
-        console.log(err);
+connectDatabase().then(result => {
+    //스케줄러
+    cron.schedule("0 10 3 * * *", () => {
+        scheduleSettlement();
     });
+    cron.schedule("0 0 3 * * *", () => {
+        scheduleArchive();
+    });
+})
 
-//스케줄러
-cron.schedule("0 10 3 * * *", () => {
-    scheduleSettlement();
-});
-cron.schedule("0 0 3 * * *", () => {
-    scheduleArchive();
-});
 // 서버 구동
 if (fs.existsSync("./key.pem") && fs.existsSync("./cert.pem")) {
     const privateKey = fs.readFileSync(__dirname + "/key.pem", "utf8");

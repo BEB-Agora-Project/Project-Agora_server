@@ -77,6 +77,11 @@ module.exports = (sequelize, DataTypes) => {
             sourceKey: "id",
             onDelete: 'cascade',
             onUpdate: 'cascade'});
+        Post.hasMany(models.Recommend,{
+            foreignKey: "post_id",
+            sourceKey: "id",
+            onDelete: 'cascade',
+            onUpdate: 'cascade'});
     };
     return Post;
 };
