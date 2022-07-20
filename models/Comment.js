@@ -8,7 +8,11 @@ module.exports = (sequelize, DataTypes) => {
     {
       content: {
         type: DataTypes.STRING(500),
-        allowNull: false,
+        allowNull: true,
+      },
+      image: {
+        type: DataTypes.STRING(1000),
+        allowNull: true,
       },
       up: {
         type: DataTypes.INTEGER(30),
