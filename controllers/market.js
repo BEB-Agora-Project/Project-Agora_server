@@ -40,7 +40,9 @@ module.exports = {
     const parameters = [userAddress, tokenId, price];
     await nftBuy(parameters);
 
-    return res.status(102).send("구매요청이 완료되었습니다.");
+    setTimeout(() => {
+      res.status(102).send("구매요청이 완료되었습니다.");
+    }, 7000);
   }),
   getNormalItemList: async (req, res) => {
     const result = await Normalitem.findAll();
