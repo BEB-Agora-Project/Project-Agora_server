@@ -37,7 +37,7 @@ module.exports = {
       );
     }
 
-    if (content || (await textFilter(content))) {
+    if (content && (await textFilter(content))) {
       throw new CustomError(
         "댓글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.",
         StatusCodes.CONFLICT
