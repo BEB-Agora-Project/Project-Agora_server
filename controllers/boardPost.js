@@ -1,4 +1,4 @@
-const {Post, User, Comment, Board} = require("../models");
+const {Post, User, Comment, Board,Recommend} = require("../models");
 
 const {asyncWrapper} = require("../errors/async");
 const CustomError = require("../errors/custom-error");
@@ -284,7 +284,7 @@ module.exports = {
         // await mintToken(userInfo.address, 1);
         res.status(StatusCodes.ACCEPTED).send({message: "ok"});
     }),
-    boardPostVote: asyncWrapper(async (req, res) => {
+    voteBoardPost: asyncWrapper(async (req, res) => {
         const userId = await getUserId(req);
         if (!userId) {
             throw new CustomError(
@@ -294,9 +294,25 @@ module.exports = {
         }
         const vote = req.query.vote;
         const postId = req.params.post_id;
-        const postInfo = await Post.findByPk(postId);
-
+        const postInfo = await Post.findOne({
+            where:{id:postId}
+        });
+        if(!postInfo){
+            throw new CustomError("존재하지 않는 게시글입니다.",StatusCodes.CONFLICT)
+        }
+        const isRecommend = await Recommend.findOne({
+            where:{user_id:userId,post_id:postId}
+        })
+        if(isRecommend){
+            console.log(isRecommend)
+            throw new CustomError("이미 추천/반대 하였습니다.",StatusCodes.CONFLICT)
+        }
         let curVote;
+        await Recommend.create({
+            state:vote,
+            post_id:postId,
+            user_id:userId
+        })
 
         if (vote === "up") {
             curVote = postInfo.up;
@@ -304,6 +320,7 @@ module.exports = {
             await postInfo.update({
                 up: curVote,
             });
+
             return res.status(200).send({curVote: curVote});
         } else if (vote === "down") {
             curVote = postInfo.down;
