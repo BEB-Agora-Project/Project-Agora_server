@@ -10,7 +10,7 @@ const { textFilter } = require("../utils/filtering");
 
 module.exports = {
   writeBoardPostComment: asyncWrapper(async (req, res) => {
-    const { content } = req.body;
+    const { content, image } = req.body;
     const postId = req.params.post_id;
 
     const userId = await getUserId(req);
@@ -18,7 +18,7 @@ module.exports = {
       throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
 
-    if (postId === undefined || content === undefined) {
+    if (postId === undefined) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
         StatusCodes.BAD_REQUEST
@@ -37,7 +37,7 @@ module.exports = {
       );
     }
 
-    if (await textFilter(content)) {
+    if (content || (await textFilter(content))) {
       throw new CustomError(
         "댓글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.",
         StatusCodes.CONFLICT
@@ -46,6 +46,7 @@ module.exports = {
 
     const newComment = await Comment.create({
       content: content,
+      image: image,
       user_id: userId,
       post_id: postId,
     });
