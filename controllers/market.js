@@ -39,7 +39,11 @@ module.exports = {
     //item이 nft라는 뜻
 
     const parameters = [userAddress, tokenId, price];
-    await nftBuy(parameters, res);
+    await nftBuy(parameters);
+
+    res
+      .status(102)
+      .send({ message: "구매 요청이 완료되었습니다", data: final });
   }),
   getNormalItemList: async (req, res) => {
     const result = await Normalitem.findAll();
