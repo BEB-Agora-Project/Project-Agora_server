@@ -20,12 +20,12 @@ const swaggerFile = require("./swagger/swagger-output.json");
 const https = require("https");
 const fs = require("fs");
 const app = express();
-const PORT = process.env.HTTPS_PORT;
+const PORT = process.env.PORT || 8080;
 
-//이벤트 듣기
 tokenReward();
 nftBuy();
-archived;
+archived();
+
 // api 통신을 위한 모듈 설정
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -53,7 +53,7 @@ app.use(errorHandler);
 // app.post("/test", Test);
 
 // 데이터베이스 생성
-// serverInit.createDatabase();
+// serverInit.createDatabase()
 // 데이터베이스 연결
 models.sequelize
   .sync()
@@ -83,6 +83,8 @@ if (fs.existsSync("./key.pem") && fs.existsSync("./cert.pem")) {
   });
 } else {
   app.listen(PORT, async () => {
+    //이벤트 듣기
+
     console.log("you don't have cert.pem, key.pem!!");
     console.log(`      🚀 HTTP Server is starting on ${PORT}`);
   });

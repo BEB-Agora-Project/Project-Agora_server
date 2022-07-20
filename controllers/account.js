@@ -22,6 +22,7 @@ const Caver = require("caver-js");
 const caver = new Caver("https://api.baobab.klaytn.net:8651/");
 const bcrypt = require("bcrypt");
 const { sendMailAuth, sendNewPassword } = require("../utils/mailer");
+const axios = require("axios");
 
 module.exports = {
   signIn: asyncWrapper(async (req, res, next) => {
@@ -251,7 +252,7 @@ module.exports = {
     });
     const arr = await Promise.all(
       nfts.map(async (el) => {
-        const res = await axios.get(el.tokenURI);
+        const res = await axios.get(el.dataValues.token_uri);
         const metaData = res.data;
         return metaData;
       })
@@ -259,7 +260,7 @@ module.exports = {
 
     const myNFT = [];
     for (let i = 0; i < nfts.length; i++) {
-      myNFT.push(Object.assign(arr[i], nfts[i]));
+      myNFT.push(Object.assign(arr[i], nfts[i].dataValues));
     }
 
     const myBoard = await Board.findAll({ where: { user_id: userId } });
@@ -298,7 +299,7 @@ module.exports = {
     });
     const arr = await Promise.all(
       nfts.map(async (el) => {
-        const res = await axios.get(el.tokenURI);
+        const res = await axios.get(el.dataValues.token_uri);
         const metaData = res.data;
         return metaData;
       })
@@ -306,7 +307,7 @@ module.exports = {
 
     const myNFT = [];
     for (let i = 0; i < nfts.length; i++) {
-      myNFT.push(Object.assign(arr[i], nfts[i]));
+      myNFT.push(Object.assign(arr[i], nfts[i].dataValues));
     }
 
     const result = {

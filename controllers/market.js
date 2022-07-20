@@ -14,7 +14,7 @@ module.exports = {
 
     const arr = await Promise.all(
       nfts.map(async (el) => {
-        const res = await axios.get(el.tokenURI);
+        const res = await axios.get(el.dataValues.token_uri);
         const metaData = res.data;
         return metaData;
       })
@@ -22,7 +22,7 @@ module.exports = {
 
     const result = [];
     for (let i = 0; i < nfts.length; i++) {
-      result.push(Object.assign(arr[i], nfts[i]));
+      result.push(Object.assign(arr[i], nfts[i].dataValues));
     }
     return res.status(200).send(result);
   },
@@ -52,17 +52,10 @@ module.exports = {
 
     //item이 nft라는 뜻
     const parameters = [userAddress, tokenId, price];
-<<<<<<< HEAD
-    const result = await nftBuy(parameters);
-    res
-      .status(102)
-      .send({ message: "구매 요청이 완료되었습니다", data: result });
-  },
-=======
     await nftBuy(parameters);
+
     res.status(102).send("구매요청이 완료되었습니다.");
   }),
->>>>>>> main
   getNormalItemList: async (req, res) => {
     const result = await Normalitem.findAll();
     return res.status(200).send(result);

@@ -9,12 +9,11 @@ const mysql = require("mysql2");
 const db = {};
 
 let sequelize = new Sequelize(
-  development.database,
-  development.username,
-  development.password,
-  development
+  production.database,
+  production.username,
+  production.password,
+  production
 );
-
 
 fs.readdirSync(__dirname)
   .filter((file) => {
