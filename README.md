@@ -6,4 +6,4 @@
 
 3. edit .env.exmaple file and rename it to .env
 
-4. Type npm run start to run the server
+4. Type npm run start to run the server..
