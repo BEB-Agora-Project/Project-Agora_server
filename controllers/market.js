@@ -4,7 +4,7 @@ const { Op } = require("sequelize");
 
 const { getUserId } = require("../utils/getUserId");
 const { balanceCheck } = require("../utils/balanceCheck");
-const nftBuy = require("../utils/transactions");
+const { nftBuy } = require("../utils/transactions");
 
 module.exports = {
   getNFTItemList: async (req, res) => {
@@ -51,6 +51,10 @@ module.exports = {
 
     const itemInfo = await Normalitem.findByPk(itemId);
     const price = itemInfo.price;
+
+    if (!itemInfo) {
+      return res.status(404).send("존재하지 않는 아이템입니다");
+    }
 
     const curBalance = await balanceCheck(userId);
 
