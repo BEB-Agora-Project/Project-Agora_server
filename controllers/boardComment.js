@@ -1,12 +1,12 @@
 module.exports = {};
-const { Post, User, Comment, Board} = require("../models");
+const { Post, User, Comment, Board } = require("../models");
 
 const { isAuthorized } = require("../middleware/webToken");
 const { asyncWrapper } = require("../errors/async");
 const { getUserId } = require("../utils/getUserId");
 const CustomError = require("../errors/custom-error");
 const StatusCodes = require("http-status-codes");
-const {textFilter}=require("../utils/filtering")
+const { textFilter } = require("../utils/filtering");
 
 module.exports = {
   writeBoardPostComment: asyncWrapper(async (req, res) => {
@@ -25,17 +25,23 @@ module.exports = {
       );
     }
 
-    const currentBoard =await Post.findOne({
-      where:{
-        id:postId
-      }
-    })
-    if(!currentBoard){
-      throw new CustomError("존재하지 않는 게시글입니다.", StatusCodes.METHOD_NOT_ALLOWED);
+    const currentBoard = await Post.findOne({
+      where: {
+        id: postId,
+      },
+    });
+    if (!currentBoard) {
+      throw new CustomError(
+        "존재하지 않는 게시글입니다.",
+        StatusCodes.METHOD_NOT_ALLOWED
+      );
     }
 
-    if(await textFilter(content)){
-      throw new CustomError("댓글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
+    if (await textFilter(content)) {
+      throw new CustomError(
+        "댓글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.",
+        StatusCodes.CONFLICT
+      );
     }
 
     const newComment = await Comment.create({
@@ -66,8 +72,8 @@ module.exports = {
 
     if (!commentData) {
       throw new CustomError(
-          "존재하지 않는 댓글입니다.",
-          StatusCodes.METHOD_NOT_ALLOWED
+        "존재하지 않는 댓글입니다.",
+        StatusCodes.METHOD_NOT_ALLOWED
       );
     }
 
@@ -77,8 +83,11 @@ module.exports = {
         StatusCodes.METHOD_NOT_ALLOWED
       );
     }
-    if(await textFilter(content)){
-      throw new CustomError("댓글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.", StatusCodes.CONFLICT);
+    if (await textFilter(content)) {
+      throw new CustomError(
+        "댓글 내용에 사용할 수 없는 문자열이 포함되어 있습니다.",
+        StatusCodes.CONFLICT
+      );
     }
 
     await commentData.update({
@@ -137,7 +146,9 @@ Writing ID를 받아서 해당 writing에 대한 정보를 응답
     }
     const comments = await Comment.findAll({
       where: { post_id: postId },
-      include: [{ model: User, attributes: ["username"] }],
+      include: [
+        { model: User, attributes: ["username", "profile_image", "badge"] },
+      ],
     });
 
     return res.status(StatusCodes.OK).send(comments);

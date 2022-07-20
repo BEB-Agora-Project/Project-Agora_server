@@ -158,7 +158,7 @@ module.exports = {
         where: { opinion: opinion, title: { [Op.like]: "%" + keyword + "%" } },
         order: [["id", "DESC"]],
         include: [
-          { model: User, attributes: ["username"] },
+          { model: User, attributes: ["username", "profile_image", "badge"] },
           { model: Comment, attributes: ["id"] },
         ],
         offset: paging(page, pagingSize),
@@ -198,7 +198,7 @@ module.exports = {
         ["up", "DESC"],
       ],
       include: [
-        { model: User, attributes: ["username"] },
+        { model: User, attributes: ["username", "profile_image", "badge"] },
         { model: Comment, attributes: ["id"] },
       ],
       offset: paging(page, pagingSize),

@@ -146,7 +146,7 @@ module.exports = {
 
     const postData = await Post.findByPk(postId, {
       include: [
-        { model: User, attributes: ["username"] },
+        { model: User, attributes: ["username", "profile_image", "badge"] },
         { model: Board, attributes: ["boardname"] },
       ],
     });
@@ -184,7 +184,7 @@ module.exports = {
         where: { board_id: boardId },
         order: [["id", "DESC"]],
         include: [
-          { model: User, attributes: ["username"] },
+          { model: User, attributes: ["username", "profile_image", "badge"] },
           { model: Comment, attributes: ["id"] },
         ],
         offset: paging(page, pagingSize),
@@ -195,7 +195,7 @@ module.exports = {
         where: { board_id: boardId, title: { [Op.like]: "%" + keyword + "%" } },
         order: [["id", "DESC"]],
         include: [
-          { model: User, attributes: ["username"] },
+          { model: User, attributes: ["username", "profile_image", "badge"] },
           { model: Comment, attributes: ["id"] },
         ],
         offset: paging(page, pagingSize),
@@ -329,7 +329,7 @@ module.exports = {
         ["up", "DESC"],
       ],
       include: [
-        { model: User, attributes: ["username"] },
+        { model: User, attributes: ["username", "profile_image", "badge"] },
         { model: Board, attributes: ["boardname"] },
         {
           model: Comment,

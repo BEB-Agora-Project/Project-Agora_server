@@ -90,7 +90,9 @@ module.exports = {
     console.log(postId);
     const result = await Comment.findAll({
       where: { post_id: postId },
-      include: [{ model: User, attributes: ["username"] }],
+      include: [
+        { model: User, attributes: ["username", "profile_image", "badge"] },
+      ],
     });
     if (result === null) {
       return res.status(204).send("아직 코멘트가 없습니다");
