@@ -240,13 +240,22 @@ module.exports = {
       include: [{ model: Comment, attributes: ["id"] }],
     });
 
-    const myItem = await MarketItem.findAll({ where: { user_id: userId } });
+    const myItem = await Normalitemlist.findAll({
+      where: { user_id: userId },
+      attributes: ["user_id"],
+      include: [{ model: Normalitem, attributes: ["id", "itemname"] }],
+    });
+
+    const myNFT = await Nftitem.findAll({
+      where: { user_id: userId },
+    });
     const myBoard = await Board.findAll({ where: { user_id: userId } });
 
     const returnObj = {
       userinfo: userInfo,
       myposts: myPosts,
       myitems: myItem,
+      mynft: myNFT,
       myboards: myBoard,
     };
 
@@ -267,7 +276,8 @@ module.exports = {
 
     const myItem = await Normalitemlist.findAll({
       where: { user_id: userId },
-      include: [{ model: Normalitem }],
+      attributes: ["user_id"],
+      include: [{ model: Normalitem, attributes: ["id", "itemname"] }],
     });
 
     const myNFT = await Nftitem.findAll({

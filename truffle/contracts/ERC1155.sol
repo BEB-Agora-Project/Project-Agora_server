@@ -10,6 +10,7 @@ contract AgoraTokens is ERC1155, Ownable {
     Counters.Counter private _tokenIds;
     uint256 public constant AgoraToken = 1;
     uint256 public constant testNFT = 2;
+    uint256 internal nonce = 0;
     mapping (uint256 => uint256) private tokenPrice;
     mapping (uint256 => address) private tokenOwner;
 
@@ -19,9 +20,10 @@ contract AgoraTokens is ERC1155, Ownable {
     event MintedToken(address[] toArr, uint256[] amount);
     event MintedNFT(uint256 tokenId, uint256 price);
     event UserNFTBuy(address buyer, uint256 tokenId, uint256 price);
+    event UserNFTFail(address buyer, uint256 tokenId, uint256 price);
     
 
-    constructor() ERC1155("https://www.example.com/{tokenId}") {
+    constructor() ERC1155("https://nftjson1123.herokuapp.com/agora/{tokenId}") {
         _tokenIds.increment();
         _tokenIds.increment();
         tokenOwner[2] = msg.sender;
@@ -67,19 +69,36 @@ contract AgoraTokens is ERC1155, Ownable {
     function buyNFT (address buyer, uint256 tokenId, uint256 price) external onlyOwner returns(bool){
         require(tokenId <= _tokenIds.current(), "Corresponding token does not exist");
         require(price >= tokenPrice[tokenId], "Not enough payment");
+         uint256 diceResult = _randomDice();
+        _burn(buyer, AgoraToken, price);
+
+         if(diceResult <=10) {
         safeTransferFrom(msg.sender, buyer, tokenId, 1, "");
         tokenPrice[tokenId] = price;
         tokenOwner[tokenId] = buyer;
-        _burn(buyer, AgoraToken, price);
         emit UserNFTBuy(buyer, tokenId, price);
 
         return true;
+         }
+         else{
+        emit UserNFTFail(buyer, tokenId, price);
+        return false;
+         }
     }
     
     function ownerOfNFT (uint256 tokenId) external view returns(address){
         return tokenOwner[tokenId];
     }
 
+
+    //수도 랜덤입니다, 절대 사용하지 마세요
+    function _randomDice () internal returns (uint256) {
+        uint256 randomNumber = uint256(keccak256(abi.encodePacked(block.timestamp,block.difficulty,nonce))) % 100;
+        randomNumber = randomNumber + 1;
+        nonce++;
+
+        return randomNumber;
+    }
 
 
 }

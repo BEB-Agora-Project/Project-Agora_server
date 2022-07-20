@@ -9,9 +9,11 @@ const accountRoutes = require("./routes/account");
 const boardRoutes = require("./routes/board");
 const debateRoutes = require("./routes/debate");
 const marketRoutes = require("./routes/market");
+const devRoutes = require("./routes/dev");
 const errorHandler = require("./errors/error-handler");
 //테스트용 모듈입니다
 const { scheduleArchive, scheduleSettlement } = require("./utils/scheduler");
+const { tokenReward, nftBuy, archived } = require("./utils/contractSubscribe");
 const serverInit = require("./serverInit/database");
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger/swagger-output.json");
@@ -20,6 +22,10 @@ const fs = require("fs");
 const app = express();
 const PORT = process.env.HTTPS_PORT;
 
+//이벤트 듣기
+tokenReward();
+nftBuy();
+archived;
 // api 통신을 위한 모듈 설정
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -35,8 +41,9 @@ app.use(
 // 라우터 연결
 app.use("/account", accountRoutes);
 app.use("/board", boardRoutes);
-app.use("/nft", marketRoutes);
+app.use("/market", marketRoutes);
 app.use("/debate", debateRoutes);
+app.use("/dev", devRoutes);
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 //무조건 에러설정은 라우팅 설정 밑에넣는다

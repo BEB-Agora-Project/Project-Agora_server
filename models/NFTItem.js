@@ -16,11 +16,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       token_uri: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(1000),
         allowNull: false,
       },
       image_uri: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(1000),
         allowNull: false,
       },
       price: {

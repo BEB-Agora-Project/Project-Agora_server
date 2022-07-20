@@ -8,7 +8,7 @@ const nftBuy = require("../utils/transactions");
 
 module.exports = {
   getNFTItemList: async (req, res) => {
-    const result = await Nftitem.findAll();
+    const result = await Nftitem.findAll({ where: { sold: false } });
     return res.status(200).send(result);
   },
   buyNFTItem: async (req, res) => {
@@ -33,8 +33,7 @@ module.exports = {
     res.status(102).send("NFT 구매요청이 전송되었습니다.");
 
     //item이 nft라는 뜻
-    await nftInfo.update({ sold: true, user_id: userId });
-    await userInfo.update({ current_token: currentToken });
+
     const parameters = [userAddress, tokenId, price];
     await nftBuy(parameters);
   },
