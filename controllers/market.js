@@ -30,12 +30,11 @@ module.exports = {
       return res.status(402).send("컨트랙트에 보유중인 토큰이 부족합니다.");
     }
 
-    res.status(102).send("NFT 구매요청이 전송되었습니다.");
-
     //item이 nft라는 뜻
 
     const parameters = [userAddress, tokenId, price];
     await nftBuy(parameters);
+    res.status(102).send("NFT 구매요청이 전송되었습니다.");
   },
   getNormalItemList: async (req, res) => {
     const result = await Normalitem.findAll();
