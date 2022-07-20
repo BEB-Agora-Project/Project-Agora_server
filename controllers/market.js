@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { Nftitem, Normalitem, Normalitemlist, User } = require("../models");
 const { Op } = require("sequelize");
+const axios = require("axios");
 
 const { getUserId } = require("../utils/getUserId");
 const { balanceCheck } = require("../utils/balanceCheck");
@@ -9,7 +10,20 @@ const { asyncWrapper } = require("../errors/async");
 
 module.exports = {
   getNFTItemList: async (req, res) => {
-    const result = await Nftitem.findAll({ where: { sold: false } });
+    const nfts = await Nftitem.findAll({ where: { sold: false } });
+
+    const arr = await Promise.all(
+      nfts.map(async (el) => {
+        const res = await axios.get(el.tokenURI);
+        const metaData = res.data;
+        return metaData;
+      })
+    );
+
+    const result = [];
+    for (let i = 0; i < nfts.length; i++) {
+      result.push(Object.assign(arr[i], nfts[i]));
+    }
     return res.status(200).send(result);
   },
   buyNFTItem: asyncWrapper(async (req, res) => {
@@ -39,10 +53,7 @@ module.exports = {
     //item이 nft라는 뜻
     const parameters = [userAddress, tokenId, price];
     await nftBuy(parameters);
-
-    setTimeout(() => {
-      res.status(102).send("구매요청이 완료되었습니다.");
-    }, 7000);
+    res.status(102).send("구매요청이 완료되었습니다.");
   }),
   getNormalItemList: async (req, res) => {
     const result = await Normalitem.findAll();
