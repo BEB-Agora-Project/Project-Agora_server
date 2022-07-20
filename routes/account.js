@@ -1,4 +1,8 @@
 const router = require("express").Router();
+const multer  = require('multer')
+const upload = multer({
+  dest: __dirname+'/uploads/', // 이미지 업로드 경로
+})
 const {
   signIn,
   signUp,
@@ -8,6 +12,7 @@ const {
   findPassword,
   getMyPage,
   getMyInfo,
+  setProfileImage
 } = require("../controllers/account");
 
 router.post("/signin", signIn);
@@ -16,6 +21,7 @@ router.put("/password", editPassword);
 router.post("/password", findPassword);
 router.put("/username", editUsername);
 router.post("/auth", authEmail);
+router.post("/profile", upload.single('image'),setProfileImage);
 router.get("/mypage", getMyPage);
 router.get("/myinfo", getMyInfo);
 

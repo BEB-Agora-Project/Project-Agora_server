@@ -256,12 +256,27 @@ module.exports = {
     });
 
     const result = {
-      userId : userId
+      userId : userId,
       username: userInfo.username,
       email: userInfo.email,
       token: userInfo.expected_token + userInfo.current_token,
     };
 
     return res.status(200).send(result);
+  }),
+
+  setProfileImage: asyncWrapper(async (req, res) => {
+    const userId = await getUserId(req);
+    if (!userId) {
+      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
+    }
+    const userInfo = await User.findOne({
+      where: { id: userId },
+    });
+    console.log(req.file)
+
+
+
+    return res.status(200).send("ok");
   }),
 };
