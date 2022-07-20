@@ -100,7 +100,7 @@ module.exports = {
     //update DB expectedToken + currentToken => currentToken, expectedToken = 0
     //DB업데이트는 스케쥴러로 빼자, 여기서는 클레이튼 트랜잭션만 담당.
   },
-  nftBuy: async (buyInfo) => {
+  nftBuy: async (buyInfo, res) => {
     const parameters = buyInfo;
     const final = await mutex.runExclusive(async () => {
       //buyInfo엔 구매자, 토큰아이디, 가격 들어감
@@ -113,7 +113,9 @@ module.exports = {
       return result;
     });
 
-    return final;
+    return res
+      .status(102)
+      .send({ message: "구매 요청이 완료되었습니다", data: final });
   },
   archiveDebate: async (archivePost) => {
     const parameters = archivePost;
