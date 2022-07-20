@@ -1,4 +1,14 @@
-const { User, Auth, Post, MarketItem, Board, Comment } = require("../models");
+const {
+  User,
+  Auth,
+  Post,
+  MarketItem,
+  Board,
+  Comment,
+  Normalitemlist,
+  Normalitem,
+  Nftitem,
+} = require("../models");
 const {
   generateAccessToken,
   sendAccessToken,
@@ -230,13 +240,22 @@ module.exports = {
       include: [{ model: Comment, attributes: ["id"] }],
     });
 
-    const myItem = await MarketItem.findAll({ where: { user_id: userId } });
+    const myItem = await Normalitemlist.findAll({
+      where: { user_id: userId },
+      attributes: ["user_id"],
+      include: [{ model: Normalitem, attributes: ["id", "itemname"] }],
+    });
+
+    const myNFT = await Nftitem.findAll({
+      where: { user_id: userId },
+    });
     const myBoard = await Board.findAll({ where: { user_id: userId } });
 
     const returnObj = {
       userinfo: userInfo,
       myposts: myPosts,
       myitems: myItem,
+      mynft: myNFT,
       myboards: myBoard,
     };
 
@@ -255,10 +274,23 @@ module.exports = {
       attributes: ["username", "email", "current_token", "expected_token"],
     });
 
+    const myItem = await Normalitemlist.findAll({
+      where: { user_id: userId },
+      attributes: ["user_id"],
+      include: [{ model: Normalitem, attributes: ["id", "itemname"] }],
+    });
+
+    const myNFT = await Nftitem.findAll({
+      where: { user_id: userId },
+    });
+
     const result = {
+      userId: userId,
       username: userInfo.username,
       email: userInfo.email,
       token: userInfo.expected_token + userInfo.current_token,
+      nft: myNFT,
+      item: myItem,
     };
 
     return res.status(200).send(result);

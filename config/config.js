@@ -30,10 +30,10 @@ const test = {
 };
 
 const initSetting = {
-  user: env.MYSQL_USERNAME,
-  password: env.MYSQL_PASSWORD,
+  user: env.DEV_MYSQL_USERNAME,
+  password: env.DEV_MYSQL_PASSWORD,
   database: "mysql",
-  host: env.MYSQL_HOST,
+  host: env.DEV_MYSQL_HOST,
 };
 
 module.exports = { development, production, test, initSetting };

@@ -1,5 +1,7 @@
 //컨트랙트 서브스크라이브 해서 이벤트 들어오면 DB에 반영하기
 require("dotenv").config();
+const { Nftitem, User } = require("../models");
+
 const Caver = require("caver-js");
 
 const debateABI = require("../truffle/build/contracts/Debate.json").abi;
@@ -26,9 +28,75 @@ module.exports = {
     ERC1155Contract.events.BurnedToken(options, callback);
   },
   nftBuy: async () => {
-    ERC1155Contract.events.UserNFTBuy(options, callback);
+    ERC1155Contract.events.UserNFTBuy(options, async (err, event) => {
+      if (!err) {
+        const buyerAddress = event.returnValues.buyer;
+        const price = event.returnValues.price;
+        const tokenId = event.returnValues.tokenId;
+
+        const userInfo = await User.findOne({
+          where: { address: buyerAddress },
+        });
+
+        const userId = userInfo.id;
+        const currentToken = userInfo.current_token;
+        currentToken -= price;
+
+        await userInfo.update({ current_token: currentToken });
+        await Nftitem.update(
+          { price: price, user_id: userId, sold: true },
+          { where: { token_id: tokenId } }
+        );
+
+        console.log(event.returnValues);
+      } else console.log(err);
+    });
+
+    ERC1155Contract.events.UserNFTFail(options, async (err, event) => {
+      if (!err) {
+        const buyerAddress = event.returnValues.buyer;
+        const price = event.returnValues.price;
+
+        const userInfo = await User.findOne({
+          where: { address: buyerAddress },
+        });
+
+        const currentToken = userInfo.current_token;
+        currentToken -= price;
+
+        await userInfo.update({ current_token: currentToken });
+
+        console.log(event.returnValues);
+      } else console.log(err);
+    });
   },
   archived: async () => {
     archiveContract.events.Archived(options, callback);
   },
 };
+
+// {
+//   address: '0xe665B9B9d68E6d413Fe74DD2B6751cd1ee5281DF',
+//   blockNumber: 96722979,
+//   transactionHash: '0xfb0ece76f9e2344774a4889b40be36d39cb23cbce32a6c54751f313ee9818b03',
+//   transactionIndex: 0,
+//   blockHash: '0x63f132d6402905b8710ca4b44a81ae0681187a72d8793ce12331fafae154cfa3',
+//   logIndex: 2,
+//   id: 'log_d526a1f9',
+//   returnValues: Result {
+//     '0': '0x411b1a53ABaA8fD1e9d8B13f6395905Edd18d7a6',
+//     '1': '2',
+//     '2': '1000',
+//     buyer: '0x411b1a53ABaA8fD1e9d8B13f6395905Edd18d7a6',
+//     tokenId: '2',
+//     price: '1000'
+//   },
+//   event: 'UserNFTBuy',
+//   signature: '0xe27ae26b1b18b38f4b5f8f8ea52860363020cab672d4bc787da0be4cf62eb4d1',
+//   raw: {
+//     data: '0x000000000000000000000000411b1a53abaa8fd1e9d8b13f6395905edd18d7a6000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000003e8',
+//     topics: [
+//       '0xe27ae26b1b18b38f4b5f8f8ea52860363020cab672d4bc787da0be4cf62eb4d1'
+//     ]
+//   }
+// }

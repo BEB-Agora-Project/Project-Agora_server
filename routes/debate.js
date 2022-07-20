@@ -38,7 +38,5 @@ router.get("/post/:post_id", getDebatePost);
 //debate
 router.get("/archive", getArchiveList);
 router.get("/", getCurrentDebate);
-router.post("/newDebate", pushNewDebateQueue); //새 예정 토론 등록, 개발용입니다
-router.post("/newDebateDB", pushNewDebateDB);
 
 module.exports = router;

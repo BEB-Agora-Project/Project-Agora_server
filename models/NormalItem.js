@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class MarketItem extends Model {
+  class Normalitem extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -9,43 +9,34 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {}
   }
-  MarketItem.init(
+  Normalitem.init(
     {
-      token_id: {
-        type: DataTypes.INTEGER(100),
-        allowNull: false,
-      },
-      token_uri: {
-        type: DataTypes.STRING(100),
+      itemname: {
+        type: DataTypes.STRING(300),
         allowNull: false,
       },
       price: {
         type: DataTypes.INTEGER(30),
         allowNull: false, //필수값
       },
-      sold: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false, //필수값
-        defaultValue: false,
-      },
     },
     {
       sequelize,
-      modelName: "MarketItem",
+      modelName: "Normalitem",
       charset: "utf8",
       collate: "utf8_general_ci",
       underscored: true,
     }
   );
 
-  MarketItem.associate = function (models) {
-    MarketItem.belongsTo(models.User, {
-      foreignKey: "user_id",
-      targetKey: "id",
+  Normalitem.associate = function (models) {
+    Normalitem.hasMany(models.Normalitemlist, {
+      foreignKey: "normal_item_id",
+      sourceKey: "id",
       onDelete: "cascade",
       onUpdate: "cascade",
     });
   };
 
-  return MarketItem;
+  return Normalitem;
 };
