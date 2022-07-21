@@ -8,7 +8,7 @@ const debateABI = require("../truffle/build/contracts/Debate.json").abi;
 const erc1155ABI = require("../truffle/build/contracts/AgoraTokens.json").abi;
 const { WS_PROVIDER, ERC1155_ADDRESS, DEBATE_ADDRESS } = process.env;
 
-const caver = new Caver(WS_PROVIDER);
+const caver = new Caver(WS_PROVIDER, { reconnect: { auto: true } });
 
 const ERC1155Contract = new caver.contract(erc1155ABI, ERC1155_ADDRESS);
 const archiveContract = new caver.contract(debateABI, DEBATE_ADDRESS);
