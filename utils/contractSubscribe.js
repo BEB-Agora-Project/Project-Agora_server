@@ -52,6 +52,7 @@ module.exports = {
 
         console.log("성공", event.returnValues);
       } else console.log(err);
+      return;
     });
 
     ERC1155Contract.events.UserNFTFail(options, async (err, event) => {
@@ -72,6 +73,8 @@ module.exports = {
         console.log("실패", event.returnValues);
         //이벤트 객체를 인자로 받아 리턴하는 함수 작성.
       } else console.log(err);
+
+      return;
     });
   },
   archived: async () => {
