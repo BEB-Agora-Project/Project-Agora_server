@@ -30,6 +30,8 @@ module.exports = {
   nftBuyEvent: async () => {
     ERC1155Contract.events.UserNFTBuy(options, async (err, event) => {
       if (!err) {
+        global.nft = "성공";
+
         const buyerAddress = event.returnValues.buyer;
         const price = event.returnValues.price;
         const tokenId = event.returnValues.tokenId;
@@ -49,12 +51,13 @@ module.exports = {
         );
 
         console.log("성공", event.returnValues);
-        global.nft = "성공";
       } else console.log(err);
     });
 
     ERC1155Contract.events.UserNFTFail(options, async (err, event) => {
       if (!err) {
+        global.nft = "실패";
+
         const buyerAddress = event.returnValues.buyer;
         const price = event.returnValues.price;
 
@@ -67,7 +70,6 @@ module.exports = {
 
         await userInfo.update({ current_token: currentToken });
         console.log("실패", event.returnValues);
-        global.nft = "실패";
         //이벤트 객체를 인자로 받아 리턴하는 함수 작성.
       } else console.log(err);
     });
