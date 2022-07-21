@@ -5,7 +5,7 @@ const {
   getBoardPost,
   getBoardPosts,
   deleteBoardPost,
-  boardPostVote,
+  voteBoardPost,
   getPopularBoardPosts,
 } = require("../controllers/boardPost");
 
@@ -14,6 +14,7 @@ const {
   editBoardPostComment,
   deleteBoardPostComment,
   getBoardPostComments,
+  voteBoardComment
 } = require("../controllers/boardComment");
 
 const { makeBoard, getBoards } = require("../controllers/board");
@@ -23,7 +24,7 @@ const { makeBoard, getBoards } = require("../controllers/board");
 router.post("/:board_id", writeBoardPost);
 router.get("/:board_id/popular", getPopularBoardPosts);
 router.get("/:board_id", getBoardPosts);
-router.post("/post/:post_id", boardPostVote);
+router.post("/post/:post_id", voteBoardPost);
 router.get("/post/:post_id", getBoardPost);
 router.put("/post/:post_id", editBoardPost);
 router.delete("/post/:post_id", deleteBoardPost);
@@ -33,6 +34,7 @@ router.get("/", getBoards);
 router.post("/post/:post_id/comment", writeBoardPostComment);
 router.put("/post/comment/:comment_id", editBoardPostComment);
 router.delete("/post/comment/:comment_id", deleteBoardPostComment);
+router.post("/post/comment/:comment_id", voteBoardComment);
 router.get("/post/:post_id/comment", getBoardPostComments);
 
 module.exports = router;

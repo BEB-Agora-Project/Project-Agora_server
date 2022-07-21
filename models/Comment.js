@@ -53,6 +53,11 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "cascade",
       onUpdate: "cascade",
     });
+    Comment.hasMany(models.Recommend,{
+      foreignKey: "comment_id",
+      sourceKey: "id",
+      onDelete: 'cascade',
+      onUpdate: 'cascade'});
   };
 
   return Comment;
