@@ -275,7 +275,7 @@ module.exports = {
 
     return res.status(200).send(returnObj);
   }),
-  getMyInfo: async (req, res) => {
+  getMyInfo: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
     if (!userId) {
       throw new CustomError(
@@ -319,7 +319,7 @@ module.exports = {
     };
 
     return res.status(200).send(result);
-  },
+  }),
   setProfileImage: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
     if (!req.file) {
