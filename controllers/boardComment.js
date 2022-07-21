@@ -1,5 +1,5 @@
 module.exports = {};
-const { Post, User, Comment, Board } = require("../models");
+const { Post, User, Comment, Board, Recommend} = require("../models");
 
 const { isAuthorized } = require("../middleware/webToken");
 const { asyncWrapper } = require("../errors/async");
@@ -153,5 +153,83 @@ Writing ID를 받아서 해당 writing에 대한 정보를 응답
     });
 
     return res.status(StatusCodes.OK).send(comments);
+  }),
+
+  voteBoardComment: asyncWrapper(async (req, res) => {
+    const userId = await getUserId(req);
+    if (!userId) {
+      throw new CustomError(
+          "로그인되지 않은 사용자입니다",
+          StatusCodes.UNAUTHORIZED
+      );
+    }
+    const vote = req.query.vote;
+    const commentId = req.params.comment_id;
+    const commentInfo = await Comment.findOne({
+      where:{id:commentId}
+    });
+    if(!commentInfo){
+      throw new CustomError("존재하지 않는 댓글 id 입니다.",StatusCodes.CONFLICT)
+    }
+    const isRecommend = await Recommend.findOne({
+      where:{user_id:userId,comment_id:commentId}
+    })
+    if(isRecommend){
+      throw new CustomError("이미 추천/반대 하였습니다.",StatusCodes.CONFLICT)
+    }
+    let curVote;
+    await Recommend.create({
+      state:vote,
+      comment_id:commentId,
+      user_id:userId
+    })
+
+    if (vote === "up") {
+      curVote = commentInfo.up;
+      curVote++;
+      await commentInfo.update({
+        up: curVote,
+      });
+
+      return res.status(200).send({curVote: curVote});
+    } else if (vote === "down") {
+      curVote = commentInfo.down;
+      curVote++;
+      await commentInfo.update({
+        down: curVote,
+      });
+      return res.status(200).send({curVote: curVote});
+    } else {
+      return res.send(405).send("그런 요청은 없다");
+    }
+    //   const userId = await getUserId(req);
+    //   if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
+    //
+    //   const commentId = req.params.comment_id;
+    //   const vote = req.query.vote;
+    //   let curVote;
+    //
+    //   const commentInfo = await Comment.findByPk(commentId);
+    //   if (commentInfo === null) {
+    //     return res.status(404).send("존재하지 않는 코멘트입니다");
+    //   }
+    //   if (vote === "up") {
+    //     curVote = commentInfo.up;
+    //     curVote++;
+    //     await commentInfo.update({
+    //       up: curVote,
+    //     });
+    //     return res.status(200).send({ curVote: curVote });
+    //   } else if (vote === "down") {
+    //     curVote = commentInfo.down;
+    //     curVote++;
+    //     await commentInfo.update({
+    //       down: curVote,
+    //     });
+    //     return res.status(200).send({ curVote: curVote });
+    //   } else {
+    //     return res.status(400).send("올바르지 않은 요청입니다.");
+    //   }
+    // },
   }),
 };

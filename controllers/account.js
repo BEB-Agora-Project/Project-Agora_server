@@ -2,7 +2,6 @@ const {
   User,
   Auth,
   Post,
-  MarketItem,
   Board,
   Comment,
   Normalitemlist,
@@ -212,6 +211,7 @@ module.exports = {
       res.status(StatusCodes.OK).send({ message: "ok" });
     }
   }),
+
   getMyPage: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
     if (!userId) {
@@ -275,7 +275,7 @@ module.exports = {
 
     return res.status(200).send(returnObj);
   }),
-  getMyInfo: asyncWrapper(async (req, res) => {
+  getMyInfo: async (req, res) => {
     const userId = await getUserId(req);
     if (!userId) {
       throw new CustomError(
@@ -283,15 +283,14 @@ module.exports = {
         StatusCodes.UNAUTHORIZED
       );
     }
-    const userInfo = await User.findOne({
-      where: { id: userId },
-      attributes: ["username", "email", "current_token", "expected_token"],
-    });
-
     const myItem = await Normalitemlist.findAll({
       where: { user_id: userId },
       attributes: ["user_id"],
       include: [{ model: Normalitem, attributes: ["id", "itemname"] }],
+    });
+
+    const userInfo = await User.findOne({
+      where: { id: userId },
     });
 
     const nfts = await Nftitem.findAll({
@@ -320,5 +319,23 @@ module.exports = {
     };
 
     return res.status(200).send(result);
+  },
+  setProfileImage: asyncWrapper(async (req, res) => {
+    const userId = await getUserId(req);
+    if (!req.file) {
+      throw new CustomError("잘못된 파일입니다.", StatusCodes.CONFLICT);
+    }
+    const imageUrl = req.file.location;
+    if (!userId) {
+      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
+    }
+    await User.update(
+      {
+        profile_image: imageUrl,
+      },
+      { where: { id: userId } }
+    );
+
+    return res.status(200).send("ok");
   }),
 };
