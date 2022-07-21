@@ -51,9 +51,10 @@ module.exports = {
     //item이 nft라는 뜻
 
     const parameters = [userAddress, tokenId, price];
-    nftBuy(parameters);
+    await nftBuy(parameters);
 
     //전역변수에서 nft구매가 성공했는지 실패했는지 subscriber를 통해 받아와 저장하고 그결과를 참조합니다.
+    console.log("트랜잭션 실행 전", global.nft);
     if (global.nft === "실패") {
       console.log("컨트롤러 NFT 구매 실패");
       global.nft = "초기화";
