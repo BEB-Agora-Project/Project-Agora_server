@@ -14,7 +14,7 @@ const errorHandler = require("./errors/error-handler");
 //테스트용 모듈입니다
 const { scheduleArchive, scheduleSettlement } = require("./utils/scheduler");
 const { tokenReward, nftBuy, archived } = require("./utils/contractSubscribe");
-const serverInit = require("./serverInit/database");
+const { scheduleArchive, scheduleSettlement } = require("./utils/scheduler");
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger/swagger-output.json");
 const https = require("https");
@@ -66,12 +66,20 @@ models.sequelize
   });
 
 //스케줄러
-cron.schedule("0 10 3 * * *", () => {
-  scheduleSettlement();
-});
-cron.schedule("0 0 3 * * *", () => {
-  scheduleArchive();
-});
+cron.schedule(
+  "0 10 3 * * *",
+  () => {
+    scheduleSettlement();
+  },
+  timezone
+);
+cron.schedule(
+  "0 0 3 * * *",
+  () => {
+    scheduleArchive();
+  },
+  timezone
+);
 // 서버 구동
 if (fs.existsSync("./key.pem") && fs.existsSync("./cert.pem")) {
   const privateKey = fs.readFileSync(__dirname + "/key.pem", "utf8");

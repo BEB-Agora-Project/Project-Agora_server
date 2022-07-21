@@ -1,4 +1,4 @@
-const { Post, User, Comment, Board } = require("../models");
+const { Post, User, Comment, Board, Recommend } = require("../models");
 
 const { asyncWrapper } = require("../errors/async");
 const CustomError = require("../errors/custom-error");
