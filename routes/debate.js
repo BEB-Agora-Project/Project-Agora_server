@@ -14,12 +14,7 @@ const {
   getPopularDebatePostList,
 } = require("../controllers/debatePost");
 
-const {
-  getArchiveList,
-  getCurrentDebate,
-  pushNewDebateQueue,
-  pushNewDebateDB,
-} = require("../controllers/debate");
+const { getArchiveList, getCurrentDebate } = require("../controllers/debate");
 
 //comment
 router.post("/post/:post_id/comment", writeDebateComment);

@@ -99,12 +99,12 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "cascade",
       onUpdate: "cascade",
     });
-      User.hasMany(models.Recommend, {
-          foreignKey: "user_id",
-          sourceKey: "id",
-          onDelete: "cascade",
-          onUpdate: "cascade",
-      });
+    User.hasMany(models.Recommend, {
+      foreignKey: "user_id",
+      sourceKey: "id",
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    });
   };
   return User;
 };
