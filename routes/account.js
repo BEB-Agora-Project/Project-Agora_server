@@ -1,13 +1,22 @@
-const router = require('express').Router();
-const {signIn,signOut,signUp} = require('../controllers/account');
+const router = require("express").Router();
+const {
+  signIn,
+  signUp,
+  editPassword,
+  editUsername,
+  authEmail,
+  findPassword,
+  getMyPage,
+  getMyInfo,
+} = require("../controllers/account");
 
-
-
-
-router.post('/signin', signIn);
-router.post('/signup', signUp);
-router.get('/signout', signOut);
-
-
+router.post("/signin", signIn);
+router.post("/signup", signUp);
+router.put("/password", editPassword);
+router.post("/password", findPassword);
+router.put("/username", editUsername);
+router.post("/auth", authEmail);
+router.get("/mypage", getMyPage);
+router.get("/myinfo", getMyInfo);
 
 module.exports = router;
