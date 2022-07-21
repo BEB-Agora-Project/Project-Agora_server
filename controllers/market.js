@@ -58,11 +58,11 @@ module.exports = {
     if (global.nft === "실패") {
       console.log("컨트롤러 NFT 구매 실패");
       global.nft = "초기화";
-      res.send("구매에 실패했습니다");
+      return res.send("구매에 실패했습니다");
     } else if (global.nft === "성공") {
       console.log("컨트롤러 NFT 구매 성공");
       global.nft = "초기화";
-      res.send("구매에 성공했습니다");
+      return res.send("구매에 성공했습니다");
     }
   }),
   getNormalItemList: async (req, res) => {
