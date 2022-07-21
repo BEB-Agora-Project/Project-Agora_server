@@ -65,7 +65,7 @@ module.exports = {
 
     let expectedToken = userInfo.expected_token + boardPostReward;
 
-    const tokenReward = await userInfo.update({
+    await userInfo.update({
       expected_token: expectedToken,
     });
 
