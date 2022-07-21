@@ -57,11 +57,11 @@ module.exports = {
     console.log("트랜잭션 실행 전", global.nft);
     if (global.nft === "실패") {
       console.log("컨트롤러 NFT 구매 실패");
-      global.nft = "초기화";
+      global.nft = true;
       return res.send("구매에 실패했습니다");
     } else if (global.nft === "성공") {
       console.log("컨트롤러 NFT 구매 성공");
-      global.nft = "초기화";
+      global.nft = true;
       return res.send("구매에 성공했습니다");
     }
   }),
