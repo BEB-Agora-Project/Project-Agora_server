@@ -180,7 +180,7 @@ module.exports = {
     let result;
 
     if (!keyword) {
-      result = await Post.findAll({
+      result = await Post.findAndCountAll({
         where: { board_id: boardId },
         order: [["id", "DESC"]],
         include: [
@@ -192,7 +192,7 @@ module.exports = {
         limit: pagingSize,
       });
     } else {
-      result = await Post.findAll({
+      result = await Post.findAndCountAll({
         where: { board_id: boardId, title: { [Op.like]: "%" + keyword + "%" } },
         order: [["id", "DESC"]],
         include: [
@@ -297,8 +297,8 @@ module.exports = {
 
     if (!postInfo) {
       throw new CustomError(
-          `글번호 ${postId} 가 존재하지 않습니다.`,
-          StatusCodes.NOT_FOUND
+        `글번호 ${postId} 가 존재하지 않습니다.`,
+        StatusCodes.NOT_FOUND
       );
     }
     const isRecommend = await Recommend.findOne({
@@ -371,6 +371,6 @@ module.exports = {
     if (!userId) {
       throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
-    return res.status(200).send(imageUrl);
+    return res.status(200).send({ imageUrl: imageUrl });
   }),
 };

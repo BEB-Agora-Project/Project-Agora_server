@@ -25,7 +25,6 @@ const axios = require("axios");
 
 //test
 
-
 module.exports = {
   signIn: asyncWrapper(async (req, res, next) => {
     if (req.body.email === undefined || req.body.password === undefined) {
@@ -316,6 +315,7 @@ module.exports = {
       userId: userId,
       username: userInfo.username,
       email: userInfo.email,
+      profile_image: userInfo.profile_image,
       token: userInfo.expected_token + userInfo.current_token,
       nft: myNFT,
       item: myItem,
