@@ -186,6 +186,7 @@ module.exports = {
         include: [
           { model: User, attributes: ["username", "profile_image", "badge"] },
           { model: Comment, attributes: ["id"] },
+          { model: Board, attributes: ["boardname"] },
         ],
         offset: paging(page, pagingSize),
         limit: pagingSize,
@@ -197,6 +198,7 @@ module.exports = {
         include: [
           { model: User, attributes: ["username", "profile_image", "badge"] },
           { model: Comment, attributes: ["id"] },
+          { model: Board, attributes: ["boardname"] },
         ],
         offset: paging(page, pagingSize),
         limit: pagingSize,
@@ -295,8 +297,8 @@ module.exports = {
 
     if (!postInfo) {
       throw new CustomError(
-        "존재하지 않는 게시글입니다.",
-        StatusCodes.CONFLICT
+          `글번호 ${postId} 가 존재하지 않습니다.`,
+          StatusCodes.NOT_FOUND
       );
     }
     const isRecommend = await Recommend.findOne({
@@ -360,4 +362,15 @@ module.exports = {
 
     return res.status(200).send(result);
   },
+  uploadPostImage: asyncWrapper(async (req, res) => {
+    const userId = await getUserId(req);
+    if (!req.file) {
+      throw new CustomError("잘못된 파일입니다.", StatusCodes.CONFLICT);
+    }
+    const imageUrl = req.file.location;
+    if (!userId) {
+      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
+    }
+    return res.status(200).send(imageUrl);
+  }),
 };
