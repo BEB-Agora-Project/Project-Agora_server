@@ -371,6 +371,6 @@ module.exports = {
     if (!userId) {
       throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
-    return res.status(200).send(imageUrl);
+    return res.status(200).send({imageUrl:imageUrl});
   }),
 };
