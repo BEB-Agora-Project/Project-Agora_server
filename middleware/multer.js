@@ -24,7 +24,6 @@ const upload = multer({
         if (file.mimetype.startsWith('image')) {
             cb(null, true);
         } else {
-            console.log("asd")
            cb(new CustomError("올바른 파일형식이 아닙니다.",StatusCodes.CONFLICT))
         }
     },
