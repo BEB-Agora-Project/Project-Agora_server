@@ -191,6 +191,8 @@ module.exports = {
       order: [["id", "DESC"]],
     });
     const debateId = recentDebate.id;
+    let count = await Post.count({ where: { board_id: boardId } });
+
     const result = await Post.findAll({
       where: { opinion: opinion, debate_id: debateId, up: { [Op.gte]: 10 } },
       order: [
@@ -205,6 +207,6 @@ module.exports = {
       limit: pagingSize,
     });
 
-    return res.status(200).send(result);
+    return res.status(200).send({ data: result, count: count });
   },
 };

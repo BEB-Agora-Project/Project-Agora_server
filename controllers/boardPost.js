@@ -10,6 +10,7 @@ const { NOT_ACCEPTABLE, BAD_REQUEST } = require("http-status-codes");
 const { paging, postSize } = require("../utils/paging");
 const { textFilter } = require("../utils/filtering");
 const sequelize = require("sequelize");
+const board = require("./board");
 const Op = sequelize.Op;
 module.exports = {
   writeBoardPost: asyncWrapper(async (req, res) => {
@@ -178,9 +179,11 @@ module.exports = {
     }
 
     let result;
+    let count;
 
     if (!keyword) {
-      result = await Post.findAndCountAll({
+      count = await Post.count({ where: { board_id: boardId } });
+      result = await Post.findAll({
         where: { board_id: boardId },
         order: [["id", "DESC"]],
         include: [
@@ -192,7 +195,8 @@ module.exports = {
         limit: pagingSize,
       });
     } else {
-      result = await Post.findAndCountAll({
+      count = await Post.count({ where: { board_id: boardId } });
+      result = await Post.findAll({
         where: { board_id: boardId, title: { [Op.like]: "%" + keyword + "%" } },
         order: [["id", "DESC"]],
         include: [
@@ -246,6 +250,7 @@ module.exports = {
     res.status(200).json({
       status: "success",
       data: result,
+      count: count,
     });
   }),
   deleteBoardPost: asyncWrapper(async (req, res) => {
