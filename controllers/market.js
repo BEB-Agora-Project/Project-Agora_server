@@ -7,7 +7,6 @@ const { getUserId } = require("../utils/getUserId");
 const { balanceCheck } = require("../utils/balanceCheck");
 const { nftBuy } = require("../utils/transactions");
 const { asyncWrapper } = require("../errors/async");
-
 module.exports = {
   getNFTItemList: async (req, res) => {
     const nfts = await Nftitem.findAll({ where: { sold: false } });
@@ -32,7 +31,6 @@ module.exports = {
     if (!userId) {
       return res.status(401).send("로그인하지 않은 사용자입니다");
     }
-
     const nftInfo = await Nftitem.findByPk(nftId);
     const userInfo = await User.findByPk(userId);
 
@@ -51,10 +49,18 @@ module.exports = {
     }
 
     //item이 nft라는 뜻
+
     const parameters = [userAddress, tokenId, price];
     await nftBuy(parameters);
 
-    res.status(102).send("구매요청이 완료되었습니다.");
+    //전역변수에서 nft구매가 성공했는지 실패했는지 subscriber를 통해 받아와 저장하고 그결과를 참조합니다.
+    if (global.nft === "실패") {
+      console.log("컨트롤러 NFT 구매 실패");
+      res.send("구매에 실패했습니다");
+    } else if (global.nft === "성공") {
+      console.log("컨트롤러 NFT 구매 성공");
+      res.send("구매에 성공했습니다");
+    }
   }),
   getNormalItemList: async (req, res) => {
     const result = await Normalitem.findAll();
