@@ -195,7 +195,9 @@ module.exports = {
         limit: pagingSize,
       });
     } else {
-      count = await Post.count({ where: { board_id: boardId } });
+      count = await Post.count({
+        where: { board_id: boardId, title: { [Op.like]: "%" + keyword + "%" } },
+      });
       result = await Post.findAll({
         where: { board_id: boardId, title: { [Op.like]: "%" + keyword + "%" } },
         order: [["id", "DESC"]],
@@ -347,6 +349,10 @@ module.exports = {
         StatusCodes.BAD_REQUEST
       );
     }
+
+    const count = await Post.count({
+      where: { board_id: boardId, up: { [Op.gte]: 10 } },
+    });
     const result = await Post.findAll({
       where: { board_id: boardId, up: { [Op.gte]: 10 } },
       order: [
@@ -365,7 +371,7 @@ module.exports = {
       limit: pagingSize,
     });
 
-    return res.status(200).send(result);
+    return res.status(200).send({ data: result, count: count });
   },
   uploadPostImage: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
