@@ -154,22 +154,17 @@ module.exports = {
 
     //update DB expectedToken + currentToken => currentToken, expectedToken = 0, 모든 유저에 대해
     let allUser = await User.findAll();
-    let user;
     let settledToken;
-    let userId;
-    for (let i = 0; i < allUser.length; i++) {
+    for await (const user of allUser) {
       user = allUser[i];
       settledToken = user.current_token + user.expected_token;
-      userId = user.id;
 
-      await User.update(
-        {
-          current_token: settledToken,
-          expected_token: 0,
-          today_vote_count: 0,
-        },
-        { where: userId }
-      );
+      user.current_token = settledToken;
+      user.expected_token = 0;
+      user.today_vote_count = 0;
+      user.today_login = false;
+
+      await user.save();
     }
 
     return;
