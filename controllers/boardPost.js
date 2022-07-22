@@ -186,6 +186,7 @@ module.exports = {
         include: [
           { model: User, attributes: ["username", "profile_image", "badge"] },
           { model: Comment, attributes: ["id"] },
+          { model: Board, attributes: ["boardname"] },
         ],
         offset: paging(page, pagingSize),
         limit: pagingSize,
@@ -197,6 +198,7 @@ module.exports = {
         include: [
           { model: User, attributes: ["username", "profile_image", "badge"] },
           { model: Comment, attributes: ["id"] },
+          { model: Board, attributes: ["boardname"] },
         ],
         offset: paging(page, pagingSize),
         limit: pagingSize,
