@@ -23,6 +23,9 @@ const bcrypt = require("bcrypt");
 const { sendMailAuth, sendNewPassword } = require("../utils/mailer");
 const axios = require("axios");
 
+//test
+
+
 module.exports = {
   signIn: asyncWrapper(async (req, res, next) => {
     if (req.body.email === undefined || req.body.password === undefined) {
