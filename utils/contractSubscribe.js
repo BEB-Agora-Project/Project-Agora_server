@@ -17,6 +17,7 @@ const options = { fromBlock: "latest" };
 const callback = (err, event) => {
   if (!err) console.log(event);
   else console.log(err);
+  return;
 };
 
 //이벤트마다 콜백 작성해서 콜백함수 안에서 event객체로 DB 업데이트
