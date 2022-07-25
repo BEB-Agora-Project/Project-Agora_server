@@ -140,21 +140,17 @@ module.exports = {
     const postId = req.params.post_id;
     if (!postId) {
       throw new CustomError(
-        "올바르지 않은 파라미터 값입니다.",
-        StatusCodes.BAD_REQUEST
+          "올바르지 않은 파라미터 값입니다.",
+          StatusCodes.BAD_REQUEST
       );
     }
     const comments = await Comment.findAll({
-      where: { post_id: postId },
+      where: {post_id: postId},
       include: [
-        { model: User, attributes: ["username", "profile_image", "badge"] },
+        {model: User, attributes: ["username", "profile_image", "badge"]},
         {
-          model: Reply,
-          attributes: ["content", "created_at", "updated_at"],
-          include: [
-            { model: User, attributes: ["username", "profile_image", "badge"] },
-          ],
-        },
+          model: Reply, attributes: ["id","content","created_at","updated_at"], include: [{ model: User, attributes: ["username", "profile_image", "badge"]}],
+        }
       ],
     });
 

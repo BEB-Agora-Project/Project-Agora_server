@@ -341,4 +341,23 @@ module.exports = {
 
     return res.status(200).send("ok");
   }),
+  setBadge: asyncWrapper(async (req, res) => {
+    const userId = await getUserId(req);
+    if (!userId) {
+      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
+    }
+    if (!req.body.badgeId) {
+      throw new CustomError("잘못된 파라미터 값입니다.", StatusCodes.CONFLICT);
+    }
+    const badgeId = req.body.badgeId
+    await User.update(
+        {
+          badge: badgeId,
+        },
+        { where: { id: userId } }
+    );
+
+    return res.status(200).send("ok");
+  }),
+
 };
