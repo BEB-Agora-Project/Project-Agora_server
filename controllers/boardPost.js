@@ -10,6 +10,7 @@ const { NOT_ACCEPTABLE, BAD_REQUEST } = require("http-status-codes");
 const { paging, postSize } = require("../utils/paging");
 const { textFilter } = require("../utils/filtering");
 const sequelize = require("sequelize");
+const board = require("./board");
 const Op = sequelize.Op;
 module.exports = {
   writeBoardPost: asyncWrapper(async (req, res) => {
@@ -178,8 +179,10 @@ module.exports = {
     }
 
     let result;
+    let count;
 
     if (!keyword) {
+      count = await Post.count({ where: { board_id: boardId } });
       result = await Post.findAll({
         where: { board_id: boardId },
         order: [["id", "DESC"]],
@@ -192,6 +195,9 @@ module.exports = {
         limit: pagingSize,
       });
     } else {
+      count = await Post.count({
+        where: { board_id: boardId, title: { [Op.like]: "%" + keyword + "%" } },
+      });
       result = await Post.findAll({
         where: { board_id: boardId, title: { [Op.like]: "%" + keyword + "%" } },
         order: [["id", "DESC"]],
@@ -246,6 +252,7 @@ module.exports = {
     res.status(200).json({
       status: "success",
       data: result,
+      count: count,
     });
   }),
   deleteBoardPost: asyncWrapper(async (req, res) => {
@@ -297,8 +304,8 @@ module.exports = {
 
     if (!postInfo) {
       throw new CustomError(
-          `글번호 ${postId} 가 존재하지 않습니다.`,
-          StatusCodes.NOT_FOUND
+        `글번호 ${postId} 가 존재하지 않습니다.`,
+        StatusCodes.NOT_FOUND
       );
     }
     const isRecommend = await Recommend.findOne({
@@ -342,6 +349,10 @@ module.exports = {
         StatusCodes.BAD_REQUEST
       );
     }
+
+    const count = await Post.count({
+      where: { board_id: boardId, up: { [Op.gte]: 10 } },
+    });
     const result = await Post.findAll({
       where: { board_id: boardId, up: { [Op.gte]: 10 } },
       order: [
@@ -360,7 +371,7 @@ module.exports = {
       limit: pagingSize,
     });
 
-    return res.status(200).send(result);
+    return res.status(200).send({ data: result, count: count });
   },
   uploadPostImage: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
@@ -371,6 +382,6 @@ module.exports = {
     if (!userId) {
       throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
     }
-    return res.status(200).send({imageUrl:imageUrl});
+    return res.status(200).send({ imageUrl: imageUrl });
   }),
 };
