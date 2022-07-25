@@ -29,6 +29,7 @@ const PORT = process.env.PORT || 8080;
 global.nft = false;
 
 nftBuyEvent();
+
 // api 통신을 위한 모듈 설정
 app.use(cookieParser());
 app.use(bodyParser.json());

@@ -8,7 +8,7 @@ const debateABI = require("../truffle/build/contracts/Debate.json").abi;
 const erc1155ABI = require("../truffle/build/contracts/AgoraTokens.json").abi;
 const { WS_PROVIDER, ERC1155_ADDRESS, DEBATE_ADDRESS } = process.env;
 
-const caver = new Caver(WS_PROVIDER);
+const caver = new Caver(WS_PROVIDER, { reconnect: { auto: true } });
 
 const ERC1155Contract = new caver.contract(erc1155ABI, ERC1155_ADDRESS);
 const archiveContract = new caver.contract(debateABI, DEBATE_ADDRESS);
@@ -17,6 +17,7 @@ const options = { fromBlock: "latest" };
 const callback = (err, event) => {
   if (!err) console.log(event);
   else console.log(err);
+  return;
 };
 
 //이벤트마다 콜백 작성해서 콜백함수 안에서 event객체로 DB 업데이트
@@ -30,6 +31,8 @@ module.exports = {
   nftBuyEvent: async () => {
     ERC1155Contract.events.UserNFTBuy(options, async (err, event) => {
       if (!err) {
+        global.nft = "성공";
+
         const buyerAddress = event.returnValues.buyer;
         const price = event.returnValues.price;
         const tokenId = event.returnValues.tokenId;
@@ -49,12 +52,14 @@ module.exports = {
         );
 
         console.log("성공", event.returnValues);
-        global.nft = "성공";
       } else console.log(err);
+      return;
     });
 
     ERC1155Contract.events.UserNFTFail(options, async (err, event) => {
       if (!err) {
+        global.nft = "실패";
+
         const buyerAddress = event.returnValues.buyer;
         const price = event.returnValues.price;
 
@@ -67,9 +72,10 @@ module.exports = {
 
         await userInfo.update({ current_token: currentToken });
         console.log("실패", event.returnValues);
-        global.nft = "실패";
         //이벤트 객체를 인자로 받아 리턴하는 함수 작성.
       } else console.log(err);
+
+      return;
     });
   },
   archived: async () => {

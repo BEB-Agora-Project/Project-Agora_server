@@ -25,7 +25,6 @@ const axios = require("axios");
 
 //test
 
-
 module.exports = {
   signIn: asyncWrapper(async (req, res, next) => {
     if (req.body.email === undefined || req.body.password === undefined) {
@@ -278,7 +277,7 @@ module.exports = {
 
     return res.status(200).send(returnObj);
   }),
-  getMyInfo: async (req, res) => {
+  getMyInfo: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
     if (!userId) {
       throw new CustomError(
@@ -316,13 +315,14 @@ module.exports = {
       userId: userId,
       username: userInfo.username,
       email: userInfo.email,
+      profile_image: userInfo.profile_image,
       token: userInfo.expected_token + userInfo.current_token,
       nft: myNFT,
       item: myItem,
     };
 
     return res.status(200).send(result);
-  },
+  }),
   setProfileImage: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
     if (!req.file) {

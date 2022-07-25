@@ -14,6 +14,12 @@ const {
   getPopularDebatePostList,
 } = require("../controllers/debatePost");
 
+const {
+  writeBoardPostCommentReply,
+  editBoardPostCommentReply,
+  deleteBoardPostCommentReply,
+} = require("../controllers/boardCommentReply");
+
 const { getArchiveList, getCurrentDebate } = require("../controllers/debate");
 
 //comment
@@ -29,6 +35,11 @@ router.post("/post/:post_id", voteDebatePost); //up,down vote 인지 확인 ?vot
 router.put("/post/:post_id", editDebatePost);
 router.get("/post/list", getDebatePostList); //?opinion 에 따라 해당 포스트 리턴
 router.get("/post/:post_id", getDebatePost);
+
+//boardCommentReply
+router.post("/post/:comment_id/reply", writeBoardPostCommentReply);
+router.put("/post/reply/:reply_id", editBoardPostCommentReply);
+router.delete("/post/reply/:reply_id", deleteBoardPostCommentReply);
 
 //debate
 router.get("/archive", getArchiveList);

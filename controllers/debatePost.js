@@ -140,22 +140,46 @@ module.exports = {
     const opinion = req.query.opinion;
     const page = req.query.page;
     const keyword = req.query.keyword;
+
+    const recentDebate = await Debate.findOne({
+      order: [["id", "DESC"]],
+    });
+    const debateId = recentDebate.id;
+
     let result;
+    let count;
 
     if (!keyword) {
+      count = await Post.count({
+        where: {
+          opinion: opinion,
+          debate_id: debateId,
+        },
+      });
       result = await Post.findAll({
-        where: { opinion: opinion },
+        where: { opinion: opinion, debate_id: debateId },
         order: [["id", "DESC"]],
         include: [
-          { model: User, attributes: ["username"] },
+          { model: User, attributes: ["username", "profile_image", "badge"] },
           { model: Comment, attributes: ["id"] },
         ],
         offset: paging(page, pagingSize),
         limit: pagingSize,
       });
     } else {
+      count = await Post.count({
+        where: {
+          opinion: opinion,
+          debate_id: debateId,
+          title: { [Op.like]: "%" + keyword + "%" },
+        },
+      });
       result = await Post.findAll({
-        where: { opinion: opinion, title: { [Op.like]: "%" + keyword + "%" } },
+        where: {
+          opinion: opinion,
+          debate_id: debateId,
+          title: { [Op.like]: "%" + keyword + "%" },
+        },
         order: [["id", "DESC"]],
         include: [
           { model: User, attributes: ["username", "profile_image", "badge"] },
@@ -169,7 +193,7 @@ module.exports = {
     if (result === null) {
       return res.status(204).send("아직 포스트가 존재하지 않습니다");
     }
-    return res.status(200).send(result);
+    return res.status(200).send({ data: result, count: count });
   },
   getDebatePost: async (req, res) => {
     const postId = req.params.post_id;
@@ -191,6 +215,10 @@ module.exports = {
       order: [["id", "DESC"]],
     });
     const debateId = recentDebate.id;
+    const count = await Post.count({
+      where: { opinion: opinion, debate_id: debateId, up: { [Op.gte]: 10 } },
+    });
+
     const result = await Post.findAll({
       where: { opinion: opinion, debate_id: debateId, up: { [Op.gte]: 10 } },
       order: [
@@ -205,6 +233,6 @@ module.exports = {
       limit: pagingSize,
     });
 
-    return res.status(200).send(result);
+    return res.status(200).send({ data: result, count: count });
   },
 };
