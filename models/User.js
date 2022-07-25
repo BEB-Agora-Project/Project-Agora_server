@@ -51,7 +51,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       badge: {
-        type: DataTypes.STRING(300),
+        type: DataTypes.INTEGER(10),
         allowNull: true,
       },
       is_auth: {

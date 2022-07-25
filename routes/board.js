@@ -24,7 +24,7 @@ const {
   deleteBoardPostCommentReply,
 } = require("../controllers/boardCommentReply");
 
-const { makeBoard, getBoards } = require("../controllers/board");
+const { makeBoard, getBoards ,getBoardRecents} = require("../controllers/board");
 const {uploadPost} = require("../middleware/multer");
 
 
@@ -33,6 +33,7 @@ const {uploadPost} = require("../middleware/multer");
 router.post("/:board_id", writeBoardPost);
 router.post("/post/image",uploadPost,uploadPostImage);
 router.get("/:board_id/popular", getPopularBoardPosts);
+router.get("/recent", getBoardRecents);
 router.get("/:board_id", getBoardPosts);
 router.post("/post/:post_id", voteBoardPost);
 router.get("/post/:post_id", getBoardPost);

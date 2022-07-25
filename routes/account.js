@@ -9,7 +9,8 @@ const {
     findPassword,
     getMyPage,
     getMyInfo,
-    setProfileImage
+    setProfileImage,
+    setBadge
 } = require("../controllers/account");
 
 router.post("/signin", signIn);
@@ -19,6 +20,7 @@ router.post("/password", findPassword);
 router.put("/username", editUsername);
 router.post("/auth", authEmail);
 router.post("/profile", uploadProfile,setProfileImage);
+router.post("/badge",setBadge);
 router.get("/mypage", getMyPage);
 router.get("/myinfo", getMyInfo);
 
