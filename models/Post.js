@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false, //필수값
       },
       hit: {
-        typ: DataTypes.INTEGER(30),
+        type: DataTypes.INTEGER(30),
         allowNull: true, //필수값,
         defaultValue: 0,
       },
