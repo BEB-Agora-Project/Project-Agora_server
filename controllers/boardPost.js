@@ -8,6 +8,7 @@ const { boardPostReward } = require("../config/rewardConfig");
 const { pagingSize } = require("../config/pagingConfig");
 const { paging, postSize } = require("../utils/paging");
 const { textFilter } = require("../utils/filtering");
+const { getImgSrcString } = require("../utils/htmlString");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
 module.exports = {
@@ -51,15 +52,11 @@ module.exports = {
         StatusCodes.METHOD_NOT_ALLOWED
       );
     }
-    const hasImage=!!content.includes("<img")
-    console.log(content)
-    console.log(hasImage);
-
     const newPost = await Post.create({
       opinion: 3,
       title: title,
       content: content,
-      has_image:hasImage,
+      image_url:getImgSrcString(content),
       user_id: userId,
       board_id: boardId,
       debate_id: null,

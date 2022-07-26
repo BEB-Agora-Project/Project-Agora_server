@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     Post.init(
         {
             title: {
-                type:DataTypes.STRING(30),
+                type:DataTypes.STRING(50),
                 // 자주사용되는 자료형 STRING, TEXT, BOOLEAN, INTEGER, FLOAT, DATETIME
                 allowNull: false, //필수값
             },
@@ -42,8 +42,8 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true, //필수값,
                 defaultValue: 0
             },
-            has_image: {
-                type:DataTypes.BOOLEAN,
+            image_url: {
+                type:DataTypes.STRING(100),
                 allowNull: false,
             },
         },
