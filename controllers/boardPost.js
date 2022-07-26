@@ -52,11 +52,12 @@ module.exports = {
         StatusCodes.METHOD_NOT_ALLOWED
       );
     }
+    const imageUrl= content.includes("<img")?getImgSrcString(content):""
     const newPost = await Post.create({
       opinion: 3,
       title: title,
       content: content,
-      image_url:getImgSrcString(content),
+      image_url:imageUrl,
       user_id: userId,
       board_id: boardId,
       debate_id: null,
@@ -127,11 +128,11 @@ module.exports = {
         StatusCodes.CONFLICT
       );
     }
-    const hasImage=!!content.includes("<img")
+    const imageUrl= content.includes("<img")?getImgSrcString(content):""
     await postData.update({
       title: title,
       content: content,
-      has_image:hasImage
+      image_url:imageUrl
     });
 
     res.status(StatusCodes.OK).send("OK");
