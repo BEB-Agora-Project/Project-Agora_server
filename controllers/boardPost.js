@@ -253,7 +253,6 @@ module.exports = {
       where: { user_id: userId, post_id: postId },
     });
     if (isRecommend) {
-      console.log(isRecommend);
       throw new CustomError("이미 추천/반대 하였습니다.", StatusCodes.CONFLICT);
     }
     let curVote;
