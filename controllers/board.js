@@ -11,6 +11,7 @@ const {pagingSize} = require("../config/pagingConfig");
 module.exports = {
     makeBoard: asyncWrapper(async (req, res) => {
         const {boardname} = req.body;
+        const userId = req.userId
         if (!boardname) {
             throw new CustomError(
                 "게시판 이름을 적어주세요",
@@ -18,10 +19,7 @@ module.exports = {
             );
         }
 
-        const userId = await getUserId(req);
-        if (!userId) {
-            throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-        }
+
 
         const balance = await balanceCheck(userId);
 

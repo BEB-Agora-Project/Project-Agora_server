@@ -11,10 +11,7 @@ module.exports = {
   writeBoardPostCommentReply: asyncWrapper(async (req, res) => {
     const { content } = req.body;
     const commentId = req.params.comment_id;
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-    }
+    const userId = req.userId
 
     if (commentId === undefined) {
       throw new CustomError(
@@ -62,10 +59,7 @@ module.exports = {
       );
     }
 
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-    }
+    const userId = req.userId
     const replyData = await Reply.findByPk(replyId);
 
     if (!replyData) {
@@ -105,10 +99,7 @@ module.exports = {
       );
     }
 
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-    }
+    const userId = req.userId
     const replyData = await Reply.findByPk(replyId);
     const replyUserId = replyData.user_id;
 

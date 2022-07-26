@@ -12,10 +12,7 @@ module.exports = {
     const { content, image } = req.body;
     const postId = req.params.post_id;
 
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-    }
+    const userId = req.userId
 
     if (postId === undefined) {
       throw new CustomError(
@@ -57,6 +54,7 @@ module.exports = {
   editBoardPostComment: asyncWrapper(async (req, res) => {
     const commentId = req.params.comment_id;
     const { content } = req.body;
+    const userId =req.userId
     if (content === undefined || commentId === undefined) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
@@ -64,10 +62,7 @@ module.exports = {
       );
     }
 
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-    }
+
     const commentData = await Comment.findByPk(commentId);
 
     if (!commentData) {
@@ -102,6 +97,7 @@ module.exports = {
 
   deleteBoardPostComment: asyncWrapper(async (req, res) => {
     const commentId = req.params.comment_id;
+    const userId = req.userId
     if (!commentId) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
@@ -109,10 +105,7 @@ module.exports = {
       );
     }
 
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-    }
+
     const commentData = await Comment.findByPk(commentId);
     const commentUserId = commentData.user_id;
 
@@ -158,13 +151,7 @@ module.exports = {
   }),
 
   voteBoardComment: asyncWrapper(async (req, res) => {
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError(
-        "로그인되지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
-    }
+    const userId = req.userId
     const vote = req.query.vote;
     const commentId = req.params.comment_id;
     const commentInfo = await Comment.findOne({

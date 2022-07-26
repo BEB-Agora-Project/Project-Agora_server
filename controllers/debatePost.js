@@ -13,10 +13,7 @@ const { debatePostReward, VotePrice } = require("../config/rewardConfig");
 module.exports = {
   writeDebatePost: asyncWrapper(async (req, res) => {
     const { opinion, title, content } = req.body;
-    const userId = await getUserId(req);
-    if (!userId) {
-      return res.status(401).send("로그인하지 않은 사용자입니다");
-    }
+    const userId = req.userId
 
     if (await textFilter(title)) {
       return res
@@ -57,8 +54,7 @@ module.exports = {
   voteDebatePost: async (req, res) => {
     const vote = req.query.vote;
     const postId = req.params.post_id;
-    const userId = await getUserId(req);
-    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
+    const userId = req.userId
 
     const postInfo = await Post.findByPk(postId);
     if (postInfo === null) {
@@ -102,8 +98,7 @@ module.exports = {
   },
   editDebatePost: async (req, res) => {
     //response에 수정된 updatedAt 첨부
-    const userId = await getUserId(req);
-    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
+    const userId = req.userId
 
     const postId = req.params.post_id;
 

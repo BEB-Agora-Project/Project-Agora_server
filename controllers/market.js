@@ -27,10 +27,7 @@ module.exports = {
   },
   buyNFTItem: asyncWrapper(async (req, res) => {
     const { nftId } = req.body;
-    const userId = await getUserId(req);
-    if (!userId) {
-      return res.status(401).send("로그인하지 않은 사용자입니다");
-    }
+    const userId = req.userId
     const nftInfo = await Nftitem.findByPk(nftId);
     const userInfo = await User.findByPk(userId);
 
@@ -72,10 +69,7 @@ module.exports = {
   buyNormalItem: async (req, res) => {
     const { itemId } = req.body;
 
-    const userId = await getUserId(req);
-    if (!userId) {
-      return res.status(401).send("로그인하지 않은 사용자입니다");
-    }
+    const userId = req.userId
 
     const itemInfo = await Normalitem.findByPk(itemId);
     const price = itemInfo.price;

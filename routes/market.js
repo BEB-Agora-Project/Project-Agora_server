@@ -6,14 +6,12 @@ const {
   getNormalItemList,
   buyNormalItem,
 } = require("../controllers/market");
+const {isAuthorized} = require("../middleware/webToken");
 
 // router.get("/", itemList)
 
-router.get("/nft", getNFTItemList);
-router.get("/normalitem", getNormalItemList);
-router.post("/nft", buyNFTItem);
-router.post("/normalitem", buyNormalItem);
-
-router;
-
+router.get("/nft", isAuthorized,getNFTItemList);
+router.get("/normalitem",isAuthorized, getNormalItemList);
+router.post("/nft", isAuthorized,buyNFTItem);
+router.post("/normalitem",isAuthorized, buyNormalItem);
 module.exports = router;

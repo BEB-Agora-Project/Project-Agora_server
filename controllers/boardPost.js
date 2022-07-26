@@ -22,12 +22,7 @@ module.exports = {
         StatusCodes.BAD_REQUEST
       );
     }
-
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-    }
-
+    const userId = req.userId
     if (await textFilter(title)) {
       throw new CustomError(
         "게시글 제목에 사용할 수 없는 문자열이 포함되어 있습니다.",
@@ -77,17 +72,13 @@ module.exports = {
 
   editBoardPost: asyncWrapper(async (req, res) => {
     const { title, content } = req.body;
+    const userId = req.userId
     const postId = req.params.post_id;
     if (title === undefined || content === undefined) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
         StatusCodes.BAD_REQUEST
       );
-    }
-
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다", StatusCodes.UNAUTHORIZED);
     }
 
     if (!postId) {
@@ -224,13 +215,7 @@ module.exports = {
     }
     const postData = await Post.findByPk(postId);
 
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError(
-        "로그인되지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
-    }
+    const userId = req.userId
 
     if (!postData) {
       throw new CustomError(
@@ -253,13 +238,7 @@ module.exports = {
     res.status(StatusCodes.ACCEPTED).send({ message: "ok" });
   }),
   voteBoardPost: asyncWrapper(async (req, res) => {
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError(
-        "로그인되지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
-    }
+    const userId = req.userId
     const vote = req.query.vote;
     const postId = req.params.post_id;
     const postInfo = await Post.findByPk(postId);
@@ -336,14 +315,12 @@ module.exports = {
     return res.status(200).send({ data: result, count: count });
   },
   uploadPostImage: asyncWrapper(async (req, res) => {
-    const userId = await getUserId(req);
+    const userId = req.userId
     if (!req.file) {
       throw new CustomError("잘못된 파일입니다.", StatusCodes.CONFLICT);
     }
     const imageUrl = req.file.location;
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-    }
+
     return res.status(200).send({ imageUrl: imageUrl });
   }),
 
