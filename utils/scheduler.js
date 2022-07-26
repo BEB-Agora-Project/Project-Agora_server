@@ -150,7 +150,6 @@ module.exports = {
 
     const tokenResult = await tokenSettlement(mintUserList, burnUserList);
     console.log("tokenSettlement", tokenResult);
-    if (tokenResult.length === 0) return;
 
     //update DB expectedToken + currentToken => currentToken, expectedToken = 0, 모든 유저에 대해
     let allUser = await User.findAll();

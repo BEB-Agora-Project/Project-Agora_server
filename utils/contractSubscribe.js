@@ -29,6 +29,10 @@ module.exports = {
     ERC1155Contract.events.BurnedToken(options, callback);
   },
   nftBuyEvent: async () => {
+    setInterval(() => {
+      caver.klay.getBlockNumber((err, res) => console.log(res));
+    }, 20000);
+
     ERC1155Contract.events.UserNFTBuy(options, async (err, event) => {
       if (!err) {
         global.nft = "성공";
