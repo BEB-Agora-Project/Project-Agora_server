@@ -65,14 +65,14 @@ models.sequelize
 
 //스케줄러
 cron.schedule(
-  "0 30 14 * * *",
+  "0 36 14 * * *",
   () => {
     scheduleSettlement();
   },
   timezone
 );
 cron.schedule(
-  "0 31 14 * * *",
+  "0 38 14 * * *",
   () => {
     scheduleArchive();
   },

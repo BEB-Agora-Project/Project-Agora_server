@@ -9,6 +9,7 @@ const { debateQueue } = require("./debateQueue");
 
 module.exports = {
   scheduleArchive: async () => {
+    console.log("아카이브 시작");
     //토론 으로 접근 차단
     //아카이브화 진행
     // DB에서 제일 최신(아카이브화 할 포스트) 쿼리해서 다음 형태로 파라미터 만들어서 넣어주기.
@@ -108,13 +109,13 @@ module.exports = {
   },
 
   scheduleSettlement: async () => {
+    console.log("토큰 정산 시작");
     //토큰 정산 시작
     //DB에서 정산 리스트 만들기
     //정산후 DB업데이트
     //정산동안 사이트 내리기.
 
     //어차피 나중에 업데이트할거니까 싹다 가져옴
-    const attributes = ["address", "expected_token"];
     const mintList = await User.findAll({
       where: { expected_token: { [Op.gt]: 0 } },
     });
@@ -153,6 +154,7 @@ module.exports = {
 
     //update DB expectedToken + currentToken => currentToken, expectedToken = 0, 모든 유저에 대해
     let allUser = await User.findAll();
+    console.log(allUser);
     let settledToken;
     for await (const user of allUser) {
       user = allUser[i];
