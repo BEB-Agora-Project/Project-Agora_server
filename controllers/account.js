@@ -273,7 +273,6 @@ module.exports = {
   }),
   getMyInfo: asyncWrapper(async (req, res) => {
     const userId = req.userId
-    console.log(req.userId)
     const myItem = await Normalitemlist.findAll({
       where: { user_id: userId },
       attributes: ["user_id"],

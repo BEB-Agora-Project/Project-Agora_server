@@ -82,7 +82,6 @@ module.exports = {
   },
   getDebatePostCommentList: async (req, res) => {
     const postId = req.params.post_id;
-    console.log(postId);
     const result = await Comment.findAll({
       where: { post_id: postId },
       include: [
