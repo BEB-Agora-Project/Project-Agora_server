@@ -157,7 +157,6 @@ module.exports = {
     console.log(allUser);
     let settledToken;
     for await (const user of allUser) {
-      user = allUser[i];
       settledToken = user.current_token + user.expected_token;
 
       user.current_token = settledToken;
