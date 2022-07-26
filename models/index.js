@@ -9,10 +9,10 @@ const mysql = require("mysql2");
 const db = {};
 
 let sequelize = new Sequelize(
-  production.database,
-  production.username,
-  production.password,
-  production
+  development.database,
+  development.username,
+  development.password,
+  development
 );
 
 fs.readdirSync(__dirname)
