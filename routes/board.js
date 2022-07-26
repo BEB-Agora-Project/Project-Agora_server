@@ -25,35 +25,36 @@ const {
     deleteBoardPostCommentReply,
 } = require("../controllers/boardCommentReply");
 
-const {makeBoard, getBoards, getBoardRecents} = require("../controllers/board");
+const {makeBoard, getBoards} = require("../controllers/board");
 const {uploadPost} = require("../middleware/multer");
+const {isAuthorized} = require("../middleware/webToken");
 
 
 //board create
 //boardPost
-router.post("/:board_id", writeBoardPost);
-router.post("/post/image", uploadPost, uploadPostImage);
+router.post("/:board_id", isAuthorized,writeBoardPost);
+router.post("/post/image", isAuthorized,uploadPost, uploadPostImage);
 router.get("/:board_id/popular", getPopularBoardPosts);
 router.get("/post/recent", getAllBoardRecents);
 router.get("/:board_id", getBoardPosts);
-router.post("/post/:post_id", voteBoardPost);
+router.post("/post/:post_id", isAuthorized,voteBoardPost);
 router.get("/post/:post_id", getBoardPost);
-router.put("/post/:post_id", editBoardPost);
-router.delete("/post/:post_id", deleteBoardPost);
-router.post("/", makeBoard);
+router.put("/post/:post_id", isAuthorized,editBoardPost);
+router.delete("/post/:post_id", isAuthorized,deleteBoardPost);
+router.post("/", isAuthorized,makeBoard);
 router.get("/", getBoards);
 
 
 //boardComment
-router.post("/post/:post_id/comment", writeBoardPostComment);
-router.put("/post/comment/:comment_id", editBoardPostComment);
-router.delete("/post/comment/:comment_id", deleteBoardPostComment);
-router.post("/post/comment/:comment_id", voteBoardComment);
+router.post("/post/:post_id/comment", isAuthorized,writeBoardPostComment);
+router.put("/post/comment/:comment_id", isAuthorized,editBoardPostComment);
+router.delete("/post/comment/:comment_id", isAuthorized,deleteBoardPostComment);
+router.post("/post/comment/:comment_id", isAuthorized,voteBoardComment);
 router.get("/post/:post_id/comment", getBoardPostComments);
 
 //boardCommentReply
-router.post("/post/:comment_id/reply", writeBoardPostCommentReply);
-router.put("/post/reply/:reply_id", editBoardPostCommentReply);
-router.delete("/post/reply/:reply_id", deleteBoardPostCommentReply);
+router.post("/post/:comment_id/reply", isAuthorized,writeBoardPostCommentReply);
+router.put("/post/reply/:reply_id", isAuthorized,editBoardPostCommentReply);
+router.delete("/post/reply/:reply_id", isAuthorized,deleteBoardPostCommentReply);
 
 module.exports = router;

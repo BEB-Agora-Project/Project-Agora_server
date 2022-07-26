@@ -11,8 +11,7 @@ module.exports = {
 
     const post = await Post.findByPk(postId);
     if (!post) return res.send(404).send("존재하지 않는 포스트입니다");
-    const userId = await getUserId(req);
-    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
+    const userId = req.userId
     if (content && (await textFilter(content))) {
       return res
         .status(400)
@@ -29,9 +28,6 @@ module.exports = {
     return res.status(201).send(result);
   },
   voteDebateComment: async (req, res) => {
-    const userId = await getUserId(req);
-    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
-
     const commentId = req.params.comment_id;
     const vote = req.query.vote;
     let curVote;
@@ -59,11 +55,9 @@ module.exports = {
     }
   },
   editDebateComment: async (req, res) => {
-    const userId = await getUserId(req);
+    const userId = req.userId
     const { content } = req.body;
     const commentId = req.params.comment_id;
-
-    if (!userId) return res.status(401).send("로그인하지 않은 사용자입니다");
 
     if (await textFilter(content)) {
       return res

@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const {uploadProfile} = require("../middleware/multer")
+const {isAuthorized} = require("../middleware/webToken")
 const {
     signIn,
     signUp,
@@ -15,13 +16,13 @@ const {
 
 router.post("/signin", signIn);
 router.post("/signup", signUp);
-router.put("/password", editPassword);
-router.post("/password", findPassword);
-router.put("/username", editUsername);
+router.put("/password", isAuthorized,editPassword);
+router.post("/password",findPassword);
+router.put("/username", isAuthorized,editUsername);
 router.post("/auth", authEmail);
-router.post("/profile", uploadProfile,setProfileImage);
-router.post("/badge",setBadge);
-router.get("/mypage", getMyPage);
-router.get("/myinfo", getMyInfo);
+router.post("/profile", isAuthorized,uploadProfile,setProfileImage);
+router.post("/badge",isAuthorized,setBadge);
+router.get("/mypage", isAuthorized,getMyPage);
+router.get("/myinfo",isAuthorized ,getMyInfo);
 
 module.exports = router;

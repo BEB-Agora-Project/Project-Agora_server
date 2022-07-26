@@ -147,17 +147,17 @@ module.exports = {
   }),
 
   editPassword: asyncWrapper(async (req, res, next) => {
+    const userId= req.userId
     if (req.body.password === undefined) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
         StatusCodes.CONFLICT
       );
     } else {
-      const decoded = await isAuthorized(req);
       const salt = await bcrypt.genSalt(10);
       const cryptPassword = bcrypt.hashSync(req.body.password, salt);
       const userInfo = await User.findOne({
-        where: { id: decoded.id },
+        where: { id: userId },
       });
       await userInfo.update({
         password: cryptPassword,
@@ -197,15 +197,15 @@ module.exports = {
   }),
 
   editUsername: asyncWrapper(async (req, res, next) => {
+    const userId=req.userId
     if (req.body.username === undefined) {
       throw new CustomError(
         "올바르지 않은 파라미터 값입니다.",
         StatusCodes.CONFLICT
       );
     } else {
-      const decoded = await isAuthorized(req);
       const userInfo = await User.findOne({
-        where: { id: decoded.id },
+        where: { id: userId },
       });
       await userInfo.update({
         username: req.body.username,
@@ -215,13 +215,7 @@ module.exports = {
   }),
 
   getMyPage: asyncWrapper(async (req, res) => {
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError(
-        "로그인되지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
-    }
+    const userId = req.userId
     const attributes = [
       "username",
       "email",
@@ -278,13 +272,8 @@ module.exports = {
     return res.status(200).send(returnObj);
   }),
   getMyInfo: asyncWrapper(async (req, res) => {
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError(
-        "로그인되지 않은 사용자입니다",
-        StatusCodes.UNAUTHORIZED
-      );
-    }
+    const userId = req.userId
+    console.log(req.userId)
     const myItem = await Normalitemlist.findAll({
       where: { user_id: userId },
       attributes: ["user_id"],
@@ -324,14 +313,11 @@ module.exports = {
     return res.status(200).send(result);
   }),
   setProfileImage: asyncWrapper(async (req, res) => {
-    const userId = await getUserId(req);
+    const userId = req.userId
     if (!req.file) {
       throw new CustomError("잘못된 파일입니다.", StatusCodes.CONFLICT);
     }
     const imageUrl = req.file.location;
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-    }
     await User.update(
       {
         profile_image: imageUrl,
@@ -342,10 +328,7 @@ module.exports = {
     return res.status(200).send("ok");
   }),
   setBadge: asyncWrapper(async (req, res) => {
-    const userId = await getUserId(req);
-    if (!userId) {
-      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
-    }
+    const userId = req.userId
     if (!req.body.badgeId) {
       throw new CustomError("잘못된 파라미터 값입니다.", StatusCodes.CONFLICT);
     }
