@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { Comment, Post, User } = require("../models");
+const { Comment, Post, User, Reply } = require("../models");
 const { getUserId } = require("../utils/getUserId");
 const { textFilter } = require("../utils/filtering");
 
