@@ -93,6 +93,13 @@ module.exports = {
       where: { post_id: postId },
       include: [
         { model: User, attributes: ["username", "profile_image", "badge"] },
+        {
+          model: Reply,
+          attributes: ["content", "created_at", "updated_at"],
+          include: [
+            { model: User, attributes: ["username", "profile_image", "badge"] },
+          ],
+        },
       ],
     });
     if (result === null) {

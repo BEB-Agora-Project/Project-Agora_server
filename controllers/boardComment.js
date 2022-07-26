@@ -1,7 +1,6 @@
 module.exports = {};
-const { Post, User, Comment, Board, Recommend} = require("../models");
+const { Post, User, Comment, Board, Recommend, Reply } = require("../models");
 
-const { isAuthorized } = require("../middleware/webToken");
 const { asyncWrapper } = require("../errors/async");
 const { getUserId } = require("../utils/getUserId");
 const CustomError = require("../errors/custom-error");
@@ -98,8 +97,8 @@ module.exports = {
   }),
 
   /*
-Writing ID를 받아서 해당 writing에 대한 정보를 응답
-*/
+  Writing ID를 받아서 해당 writing에 대한 정보를 응답
+  */
 
   deleteBoardPostComment: asyncWrapper(async (req, res) => {
     const commentId = req.params.comment_id;
@@ -141,14 +140,17 @@ Writing ID를 받아서 해당 writing에 대한 정보를 응답
     const postId = req.params.post_id;
     if (!postId) {
       throw new CustomError(
-        "올바르지 않은 파라미터 값입니다.",
-        StatusCodes.BAD_REQUEST
+          "올바르지 않은 파라미터 값입니다.",
+          StatusCodes.BAD_REQUEST
       );
     }
     const comments = await Comment.findAll({
-      where: { post_id: postId },
+      where: {post_id: postId},
       include: [
-        { model: User, attributes: ["username", "profile_image", "badge"] },
+        {model: User, attributes: ["username", "profile_image", "badge"]},
+        {
+          model: Reply, attributes: ["id","content","created_at","updated_at"], include: [{ model: User, attributes: ["username", "profile_image", "badge"]}],
+        }
       ],
     });
 
@@ -159,30 +161,33 @@ Writing ID를 받아서 해당 writing에 대한 정보를 응답
     const userId = await getUserId(req);
     if (!userId) {
       throw new CustomError(
-          "로그인되지 않은 사용자입니다",
-          StatusCodes.UNAUTHORIZED
+        "로그인되지 않은 사용자입니다",
+        StatusCodes.UNAUTHORIZED
       );
     }
     const vote = req.query.vote;
     const commentId = req.params.comment_id;
     const commentInfo = await Comment.findOne({
-      where:{id:commentId}
+      where: { id: commentId },
     });
-    if(!commentInfo){
-      throw new CustomError("존재하지 않는 댓글 id 입니다.",StatusCodes.CONFLICT)
+    if (!commentInfo) {
+      throw new CustomError(
+        "존재하지 않는 댓글 id 입니다.",
+        StatusCodes.CONFLICT
+      );
     }
     const isRecommend = await Recommend.findOne({
-      where:{user_id:userId,comment_id:commentId}
-    })
-    if(isRecommend){
-      throw new CustomError("이미 추천/반대 하였습니다.",StatusCodes.CONFLICT)
+      where: { user_id: userId, comment_id: commentId },
+    });
+    if (isRecommend) {
+      throw new CustomError("이미 추천/반대 하였습니다.", StatusCodes.CONFLICT);
     }
     let curVote;
     await Recommend.create({
-      state:vote,
-      comment_id:commentId,
-      user_id:userId
-    })
+      state: vote,
+      comment_id: commentId,
+      user_id: userId,
+    });
 
     if (vote === "up") {
       curVote = commentInfo.up;
@@ -191,14 +196,14 @@ Writing ID를 받아서 해당 writing에 대한 정보를 응답
         up: curVote,
       });
 
-      return res.status(200).send({curVote: curVote});
+      return res.status(200).send({ curVote: curVote });
     } else if (vote === "down") {
       curVote = commentInfo.down;
       curVote++;
       await commentInfo.update({
         down: curVote,
       });
-      return res.status(200).send({curVote: curVote});
+      return res.status(200).send({ curVote: curVote });
     } else {
       return res.send(405).send("그런 요청은 없다");
     }

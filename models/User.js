@@ -51,7 +51,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       badge: {
-        type: DataTypes.STRING(300),
+        type: DataTypes.INTEGER(10),
         allowNull: true,
       },
       is_auth: {
@@ -81,7 +81,7 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "cascade",
       onUpdate: "cascade",
     });
-    User.hasMany(models.Recomment, {
+    User.hasMany(models.Reply, {
       foreignKey: "user_id",
       sourceKey: "id",
       onDelete: "cascade",

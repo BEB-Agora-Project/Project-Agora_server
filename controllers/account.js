@@ -23,6 +23,8 @@ const bcrypt = require("bcrypt");
 const { sendMailAuth, sendNewPassword } = require("../utils/mailer");
 const axios = require("axios");
 
+//test
+
 module.exports = {
   signIn: asyncWrapper(async (req, res, next) => {
     if (req.body.email === undefined || req.body.password === undefined) {
@@ -275,7 +277,7 @@ module.exports = {
 
     return res.status(200).send(returnObj);
   }),
-  getMyInfo: async (req, res) => {
+  getMyInfo: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
     if (!userId) {
       throw new CustomError(
@@ -313,13 +315,14 @@ module.exports = {
       userId: userId,
       username: userInfo.username,
       email: userInfo.email,
+      profile_image: userInfo.profile_image,
       token: userInfo.expected_token + userInfo.current_token,
       nft: myNFT,
       item: myItem,
     };
 
     return res.status(200).send(result);
-  },
+  }),
   setProfileImage: asyncWrapper(async (req, res) => {
     const userId = await getUserId(req);
     if (!req.file) {
@@ -338,4 +341,23 @@ module.exports = {
 
     return res.status(200).send("ok");
   }),
+  setBadge: asyncWrapper(async (req, res) => {
+    const userId = await getUserId(req);
+    if (!userId) {
+      throw new CustomError("로그인이 필요합니다.", StatusCodes.UNAUTHORIZED);
+    }
+    if (!req.body.badgeId) {
+      throw new CustomError("잘못된 파라미터 값입니다.", StatusCodes.CONFLICT);
+    }
+    const badgeId = req.body.badgeId
+    await User.update(
+        {
+          badge: badgeId,
+        },
+        { where: { id: userId } }
+    );
+
+    return res.status(200).send("ok");
+  }),
+
 };

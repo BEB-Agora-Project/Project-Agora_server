@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const {upload} = require("../middleware/multer")
+const {uploadProfile} = require("../middleware/multer")
 const {
     signIn,
     signUp,
@@ -9,7 +9,8 @@ const {
     findPassword,
     getMyPage,
     getMyInfo,
-    setProfileImage
+    setProfileImage,
+    setBadge
 } = require("../controllers/account");
 
 router.post("/signin", signIn);
@@ -18,7 +19,8 @@ router.put("/password", editPassword);
 router.post("/password", findPassword);
 router.put("/username", editUsername);
 router.post("/auth", authEmail);
-router.post("/profile", upload,setProfileImage);
+router.post("/profile", uploadProfile,setProfileImage);
+router.post("/badge",setBadge);
 router.get("/mypage", getMyPage);
 router.get("/myinfo", getMyInfo);
 
