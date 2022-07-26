@@ -14,22 +14,29 @@ module.exports = {
     const recentDebate = await Debate.findOne({
       order: [["id", "DESC"]],
     });
+    const debateId = recentDebate.id;
 
+    const agreePostCount = await Post.count({
+      where: { opinion: 0, debate_id: debateId },
+    });
     const agreePost = await Post.findAll({
-      where: { opinion: 0 },
-      attributes: ["title", "up"],
+      where: { opinion: 0, debate_id: debateId },
       order: [["up", "DESC"]],
       limit: 5,
+    });
+    const neutralPostCount = await Post.count({
+      where: { opinion: 1, debate_id: debateId },
     });
     const neutralPost = await Post.findAll({
-      where: { opinion: 1 },
-      attributes: ["title", "up"],
+      where: { opinion: 1, debate_id: debateId },
       order: [["up", "DESC"]],
       limit: 5,
     });
+    const disagreePostCount = await Post.count({
+      where: { opinion: 2, debate_id: debateId },
+    });
     const disagreePost = await Post.findAll({
-      where: { opinion: 2 },
-      attributes: ["title", "up"],
+      where: { opinion: 2, debate_id: debateId },
       order: [["up", "DESC"]],
       limit: 5,
     });
@@ -38,8 +45,11 @@ module.exports = {
     const result = {
       debate: recentDebate,
       agreePost: agreePost,
+      agreePostCount: agreePostCount,
       neutralPost: neutralPost,
+      neutralPostCount: neutralPostCount,
       disagreePost: disagreePost,
+      disagreePostCount: disagreePostCount,
     };
 
     return res.status(200).send(result);
