@@ -7,9 +7,8 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
-      // define association here
-    }
+    static associate(models) {}
+    // define association here
   }
   Post.init(
     {
@@ -23,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false, //필수값
       },
       hit: {
-        type: DataTypes.INTEGER(30),
+        typ: DataTypes.INTEGER(30),
         allowNull: true, //필수값,
         defaultValue: 0,
       },
@@ -42,8 +41,8 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true, //필수값,
         defaultValue: 0,
       },
-      has_image: {
-        type: DataTypes.BOOLEAN,
+      image_url: {
+        type: DataTypes.STRING(100),
         allowNull: true,
       },
     },
