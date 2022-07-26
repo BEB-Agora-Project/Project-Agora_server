@@ -51,11 +51,15 @@ module.exports = {
         StatusCodes.METHOD_NOT_ALLOWED
       );
     }
+    const hasImage=!!content.includes("<img")
+    console.log(content)
+    console.log(hasImage);
 
     const newPost = await Post.create({
       opinion: 3,
       title: title,
       content: content,
+      has_image:hasImage,
       user_id: userId,
       board_id: boardId,
       debate_id: null,
@@ -126,9 +130,11 @@ module.exports = {
         StatusCodes.CONFLICT
       );
     }
+    const hasImage=!!content.includes("<img")
     await postData.update({
       title: title,
       content: content,
+      has_image:hasImage
     });
 
     res.status(StatusCodes.OK).send("OK");
@@ -178,7 +184,7 @@ module.exports = {
 
     let result;
     let count;
-
+    const currentBoard=await Board.findOne({ where: { id: boardId }})
     if (!keyword) {
       count = await Post.count({ where: { board_id: boardId } });
       result = await Post.findAll({
@@ -187,7 +193,6 @@ module.exports = {
         include: [
           { model: User, attributes: ["username", "profile_image", "badge"] },
           { model: Comment, attributes: ["id"] },
-          { model: Board, attributes: ["boardname"] },
         ],
         offset: paging(page, pagingSize),
         limit: pagingSize,
@@ -202,55 +207,16 @@ module.exports = {
         include: [
           { model: User, attributes: ["username", "profile_image", "badge"] },
           { model: Comment, attributes: ["id"] },
-          { model: Board, attributes: ["boardname"] },
         ],
         offset: paging(page, pagingSize),
         limit: pagingSize,
       });
     }
-    // const writings = await Post.findAll({
-    //   where: { board_id: boardId },
-    //   order: [["id", "DESC"]],
-    //   include: [
-    //     { model: User, attributes: ["username"] },
-    //     { model: Board, attributes: ["boardname"] },
-    //     {
-    //       model: Comment,
-    //       attributes: ["id"],
-    //     },
-    //   ],
-    //   offset: paging(req.query.page, pagingSize),
-    //   limit: pagingSize,
-    // });
-
-    // Array에 map을 돌 때 콜백함수가 비동기면 일반적인 방법으로는 구현이 안됨
-    // 그래서 Promise.all을 사용함
-    // const data = await Promise.all(
-    //   writings.map(
-    //     async ({ id, title, created_at, updated_at, hit, user_id }) => {
-    //       const { username } = await User.findOne({
-    //         where: { id: user_id },
-    //       });
-    //       const comments = await Comment.findAndCountAll({
-    //         where: { post_id: id },
-    //       });
-    //       const commentsCount = comments.count;
-    //       return {
-    //         id,
-    //         title,
-    //         username,
-    //         hit,
-    //         commentsCount,
-    //         created_at,
-    //         updated_at,
-    //       };
-    //     }
-    //   )
-    // );
     res.status(200).json({
       status: "success",
       data: result,
       count: count,
+      boardname:currentBoard.boardname
     });
   }),
   deleteBoardPost: asyncWrapper(async (req, res) => {
@@ -382,4 +348,47 @@ module.exports = {
     }
     return res.status(200).send({ imageUrl: imageUrl });
   }),
+
+  getAllBoardRecents: asyncWrapper(async (req, res) => {
+    const page = req.query.page;
+    const keyword = req.query.keyword;
+    let result;
+    let count;
+
+    if (!keyword) {
+      count = await Post.count();
+      result = await Post.findAll({
+        order: [["id", "DESC"]],
+        include: [
+          { model: User, attributes: ["username", "profile_image", "badge"] },
+          { model: Comment, attributes: ["id"] },
+          { model: Board, attributes: ["boardname"] },
+        ],
+        offset: paging(page, pagingSize),
+        limit: pagingSize,
+      });
+    } else {
+      count = await Post.count({
+        where: {title: { [Op.like]: "%" + keyword + "%" } },
+      });
+      result = await Post.findAll({
+        where: { title: { [Op.like]: "%" + keyword + "%" } },
+        order: [["id", "DESC"]],
+        include: [
+          { model: User, attributes: ["username", "profile_image", "badge"] },
+          { model: Comment, attributes: ["id"] },
+          { model: Board, attributes: ["boardname"] },
+        ],
+        offset: paging(page, pagingSize),
+        limit: pagingSize,
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: result,
+      count: count,
+    });
+  }),
 };
+
