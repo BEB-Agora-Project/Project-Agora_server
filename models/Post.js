@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false, //필수값
             },
             content: {
-                type:DataTypes.STRING(500),
+                type:DataTypes.TEXT('long'),
                 allowNull: false, //필수값
             },
             hit: {
@@ -41,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
                 type:DataTypes.INTEGER(30),
                 allowNull: true, //필수값,
                 defaultValue: 0
+            },
+            has_image: {
+                type:DataTypes.BOOLEAN,
+                allowNull: false,
             },
         },
         {
