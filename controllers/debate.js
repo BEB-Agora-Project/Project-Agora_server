@@ -25,7 +25,7 @@ module.exports = {
       limit: 5,
     });
     const neutralPostCount = await Post.count({
-      where: { opinion: 0, debate_id: debateId },
+      where: { opinion: 1, debate_id: debateId },
     });
     const neutralPost = await Post.findAndCountAll({
       where: { opinion: 1, debate_id: debateId },
@@ -33,7 +33,7 @@ module.exports = {
       limit: 5,
     });
     const disagreePostCount = await Post.count({
-      where: { opinion: 0, debate_id: debateId },
+      where: { opinion: 2, debate_id: debateId },
     });
     const disagreePost = await Post.findAndCountAll({
       where: { opinion: 2, debate_id: debateId },
