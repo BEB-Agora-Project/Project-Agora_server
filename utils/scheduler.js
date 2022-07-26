@@ -154,7 +154,6 @@ module.exports = {
 
     //update DB expectedToken + currentToken => currentToken, expectedToken = 0, 모든 유저에 대해
     let allUser = await User.findAll();
-    console.log(allUser);
     let settledToken;
     for await (const user of allUser) {
       settledToken = user.current_token + user.expected_token;
