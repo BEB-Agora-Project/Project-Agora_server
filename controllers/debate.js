@@ -15,21 +15,18 @@ module.exports = {
       order: [["id", "DESC"]],
     });
 
-    const agreePost = await Post.findAll({
+    const agreePost = await Post.findAndCountAll({
       where: { opinion: 0 },
-      attributes: ["title", "up"],
       order: [["up", "DESC"]],
       limit: 5,
     });
-    const neutralPost = await Post.findAll({
+    const neutralPost = await Post.findAndCountAll({
       where: { opinion: 1 },
-      attributes: ["title", "up"],
       order: [["up", "DESC"]],
       limit: 5,
     });
-    const disagreePost = await Post.findAll({
+    const disagreePost = await Post.findAndCountAll({
       where: { opinion: 2 },
-      attributes: ["title", "up"],
       order: [["up", "DESC"]],
       limit: 5,
     });
