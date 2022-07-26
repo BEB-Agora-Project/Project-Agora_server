@@ -31,7 +31,7 @@ module.exports = {
   nftBuyEvent: async () => {
     setInterval(() => {
       caver.klay.getBlockNumber((err, res) => console.log(res));
-    }, 3000);
+    }, 10000);
 
     ERC1155Contract.events.UserNFTBuy(options, async (err, event) => {
       if (!err) {
