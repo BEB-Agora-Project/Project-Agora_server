@@ -19,7 +19,7 @@ module.exports = {
     const agreePostCount = await Post.count({
       where: { opinion: 0, debate_id: debateId },
     });
-    const agreePost = await Post.findAndCountAll({
+    const agreePost = await Post.findAll({
       where: { opinion: 0, debate_id: debateId },
       order: [["up", "DESC"]],
       limit: 5,
@@ -27,7 +27,7 @@ module.exports = {
     const neutralPostCount = await Post.count({
       where: { opinion: 1, debate_id: debateId },
     });
-    const neutralPost = await Post.findAndCountAll({
+    const neutralPost = await Post.findAll({
       where: { opinion: 1, debate_id: debateId },
       order: [["up", "DESC"]],
       limit: 5,
@@ -35,7 +35,7 @@ module.exports = {
     const disagreePostCount = await Post.count({
       where: { opinion: 2, debate_id: debateId },
     });
-    const disagreePost = await Post.findAndCountAll({
+    const disagreePost = await Post.findAll({
       where: { opinion: 2, debate_id: debateId },
       order: [["up", "DESC"]],
       limit: 5,
