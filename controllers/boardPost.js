@@ -51,11 +51,15 @@ module.exports = {
         StatusCodes.METHOD_NOT_ALLOWED
       );
     }
+    const hasImage=!!content.includes("<img")
+    console.log(content)
+    console.log(hasImage);
 
     const newPost = await Post.create({
       opinion: 3,
       title: title,
       content: content,
+      has_image:hasImage,
       user_id: userId,
       board_id: boardId,
       debate_id: null,
@@ -126,9 +130,11 @@ module.exports = {
         StatusCodes.CONFLICT
       );
     }
+    const hasImage=!!content.includes("<img")
     await postData.update({
       title: title,
       content: content,
+      has_image:hasImage
     });
 
     res.status(StatusCodes.OK).send("OK");
@@ -382,4 +388,47 @@ module.exports = {
     }
     return res.status(200).send({ imageUrl: imageUrl });
   }),
+
+  getAllBoardRecents: asyncWrapper(async (req, res) => {
+    const page = req.query.page;
+    const keyword = req.query.keyword;
+    let result;
+    let count;
+
+    if (!keyword) {
+      count = await Post.count();
+      result = await Post.findAll({
+        order: [["id", "DESC"]],
+        include: [
+          { model: User, attributes: ["username", "profile_image", "badge"] },
+          { model: Comment, attributes: ["id"] },
+          { model: Board, attributes: ["boardname"] },
+        ],
+        offset: paging(page, pagingSize),
+        limit: pagingSize,
+      });
+    } else {
+      count = await Post.count({
+        where: {title: { [Op.like]: "%" + keyword + "%" } },
+      });
+      result = await Post.findAll({
+        where: { title: { [Op.like]: "%" + keyword + "%" } },
+        order: [["id", "DESC"]],
+        include: [
+          { model: User, attributes: ["username", "profile_image", "badge"] },
+          { model: Comment, attributes: ["id"] },
+          { model: Board, attributes: ["boardname"] },
+        ],
+        offset: paging(page, pagingSize),
+        limit: pagingSize,
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: result,
+      count: count,
+    });
+  }),
 };
+

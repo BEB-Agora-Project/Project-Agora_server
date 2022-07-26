@@ -48,24 +48,6 @@ module.exports = {
         return res.status(200).send(result);
     },
 
-    getBoardRecents: asyncWrapper(async (req, res) => {
-        const result = await Board.findAll({
-            order: [["id", "ASC"]],
-            include: [
-                {
-                    model: Post,
-                    limit: pagingSize,
-                    order: [["id","DESC"]],
-                    include:[{ model: User, attributes: ["username", "profile_image", "badge"] }]
-                },
-            ],
 
-        });
-        console.log(result)
-        res.status(200).json({
-            status: "success",
-            data: result
-        });
-    }),
 
 };
