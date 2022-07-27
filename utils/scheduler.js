@@ -37,19 +37,19 @@ module.exports = {
     });
 
     let newDebate =
-      debateQueue.length !== 0
-        ? debateQueue.shift()
-        : {
-            title: "TEST 게시 예정인 토론이 없습니다. TEST",
-            content: "TEST 게시 예정인 토론이 없습니다. TEST",
-          };
+        debateQueue.length !== 0
+            ? debateQueue.shift()
+            : {
+              title: "TEST 게시 예정인 토론이 없습니다. TEST",
+              content: "TEST 게시 예정인 토론이 없습니다. TEST",
+            };
 
     const newDebateResult = await Debate.create(newDebate);
 
     if (
-      winAgreePost === null ||
-      winNeutralPost === null ||
-      winDisagreePost === null
+        winAgreePost === null ||
+        winNeutralPost === null ||
+        winDisagreePost === null
     ) {
       console.log("not a proper debate");
       return;
@@ -72,7 +72,7 @@ module.exports = {
     const agreeReward = (winAgreePost.up - winAgreePost.down) * winFactor;
     const neutralReward = (winNeutralPost.up - winNeutralPost.down) * winFactor;
     const disagreeReward =
-      (winDisagreePost.up - winDisagreePost.down) * winFactor;
+        (winDisagreePost.up - winDisagreePost.down) * winFactor;
 
     const agreeUserId = winAgreePost.user_id;
     const neutralUserId = winNeutralPost.user_id;

@@ -64,12 +64,12 @@ module.exports = {
   pushNewDebateDB: async (req, res) => {
     //DB에 추가
     let newDebate =
-      debateQueue.length !== 0
-        ? debateQueue.shift()
-        : {
-            title: "TEST 게시 예정인 토론이 없습니다. TEST",
-            content: "TEST 게시 예정인 토론이 없습니다. TEST",
-          };
+        debateQueue.length !== 0
+            ? debateQueue.shift()
+            : {
+              title: "TEST 게시 예정인 토론이 없습니다. TEST",
+              content: "TEST 게시 예정인 토론이 없습니다. TEST",
+            };
     const result = await Debate.create(newDebate);
     return res.send(result);
   },

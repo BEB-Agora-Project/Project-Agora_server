@@ -51,8 +51,8 @@ module.exports = {
 
         await userInfo.update({ current_token: currentToken });
         await Nftitem.update(
-          { price: price, user_id: userId, sold: true },
-          { where: { token_id: tokenId } }
+            { price: price, user_id: userId, sold: true },
+            { where: { token_id: tokenId } }
         );
 
         console.log("성공", event.returnValues);
