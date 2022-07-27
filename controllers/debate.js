@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { Debate, Post } = require("../models");
+const { Debate, Post, Comment, User } = require("../models");
 const { debateQueue } = require("../utils/debateQueue");
 
 module.exports = {
@@ -22,6 +22,10 @@ module.exports = {
     const agreePost = await Post.findAll({
       where: { opinion: 0, debate_id: debateId },
       order: [["up", "DESC"]],
+      include: [
+        { model: User, attributes: ["username", "profile_image", "badge"] },
+        { model: Comment, attributes: ["id"] },
+      ],
       limit: 5,
     });
     const neutralPostCount = await Post.count({
@@ -30,6 +34,10 @@ module.exports = {
     const neutralPost = await Post.findAll({
       where: { opinion: 1, debate_id: debateId },
       order: [["up", "DESC"]],
+      include: [
+        { model: User, attributes: ["username", "profile_image", "badge"] },
+        { model: Comment, attributes: ["id"] },
+      ],
       limit: 5,
     });
     const disagreePostCount = await Post.count({
@@ -38,6 +46,10 @@ module.exports = {
     const disagreePost = await Post.findAll({
       where: { opinion: 2, debate_id: debateId },
       order: [["up", "DESC"]],
+      include: [
+        { model: User, attributes: ["username", "profile_image", "badge"] },
+        { model: Comment, attributes: ["id"] },
+      ],
       limit: 5,
     });
 
